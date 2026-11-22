@@ -1,4 +1,4 @@
-# Build Scoop web as a static site and deploy to GitHub Pages.
+# Build Scoop web as a static site and deploy to GitHub Pages (testnet defaults).
 name: Deploy Pages
 
 on:
@@ -38,17 +38,29 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build static export
         env:
-          # Set these in repo Settings → Secrets and variables → Actions
+          # Repo Settings → Variables → Actions can override these.
+          # Defaults: BSC testnet + Solana devnet (public addresses / RPCs only).
           NEXT_PUBLIC_CHAIN: ${{ vars.NEXT_PUBLIC_CHAIN }}
           NEXT_PUBLIC_SCOOP_DIAMOND: ${{ vars.NEXT_PUBLIC_SCOOP_DIAMOND }}
           NEXT_PUBLIC_SCOOP_DEPLOY_BLOCK: ${{ vars.NEXT_PUBLIC_SCOOP_DEPLOY_BLOCK }}
           NEXT_PUBLIC_KEEPER_URL: ${{ vars.NEXT_PUBLIC_KEEPER_URL }}
           NEXT_PUBLIC_WC_PROJECT_ID: ${{ vars.NEXT_PUBLIC_WC_PROJECT_ID }}
           NEXT_PUBLIC_BSC_RPC: ${{ vars.NEXT_PUBLIC_BSC_RPC }}
-          # Project site: /repo-name ; user/org site or custom domain: leave empty
           NEXT_PUBLIC_BASE_PATH: ${{ vars.NEXT_PUBLIC_BASE_PATH }}
+          NEXT_PUBLIC_SOLANA_CLUSTER: ${{ vars.NEXT_PUBLIC_SOLANA_CLUSTER }}
+          NEXT_PUBLIC_SOLANA_PROGRAM_ID: ${{ vars.NEXT_PUBLIC_SOLANA_PROGRAM_ID }}
+          NEXT_PUBLIC_SOLANA_RPC: ${{ vars.NEXT_PUBLIC_SOLANA_RPC }}
         run: |
-          export NEXT_PUBLIC_CHAIN="${NEXT_PUBLIC_CHAIN:-mainnet}"
+          # Project Pages URL: https://0xvoren.github.io/scoop/
+          export NEXT_PUBLIC_BASE_PATH="${NEXT_PUBLIC_BASE_PATH:-/scoop}"
+          export NEXT_PUBLIC_CHAIN="${NEXT_PUBLIC_CHAIN:-testnet}"
+          export NEXT_PUBLIC_SCOOP_DIAMOND="${NEXT_PUBLIC_SCOOP_DIAMOND:-0xfB2678ff49967B073F6537781EC3d35DE731a5DF}"
+          export NEXT_PUBLIC_SCOOP_DEPLOY_BLOCK="${NEXT_PUBLIC_SCOOP_DEPLOY_BLOCK:-143943857}"
+          export NEXT_PUBLIC_BSC_RPC="${NEXT_PUBLIC_BSC_RPC:-https://bsc-testnet-rpc.publicnode.com}"
+          export NEXT_PUBLIC_SOLANA_CLUSTER="${NEXT_PUBLIC_SOLANA_CLUSTER:-devnet}"
+          export NEXT_PUBLIC_SOLANA_PROGRAM_ID="${NEXT_PUBLIC_SOLANA_PROGRAM_ID:-FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT}"
+          export NEXT_PUBLIC_SOLANA_RPC="${NEXT_PUBLIC_SOLANA_RPC:-https://api.devnet.solana.com}"
+          echo "Building for chain=${NEXT_PUBLIC_CHAIN} basePath=${NEXT_PUBLIC_BASE_PATH} solana=${NEXT_PUBLIC_SOLANA_CLUSTER}"
           pnpm build
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
