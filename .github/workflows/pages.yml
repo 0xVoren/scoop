@@ -52,6 +52,10 @@ jobs:
           NEXT_PUBLIC_SOLANA_RPC: ${{ vars.NEXT_PUBLIC_SOLANA_RPC }}
         run: |
           # Project Pages URL: https://0xvoren.github.io/scoop/
+          # Unset Variables arrive as "" — do not export empty WC id (RainbowKit throws).
+          if [ -z "${NEXT_PUBLIC_WC_PROJECT_ID:-}" ]; then
+            unset NEXT_PUBLIC_WC_PROJECT_ID
+          fi
           export NEXT_PUBLIC_BASE_PATH="${NEXT_PUBLIC_BASE_PATH:-/scoop}"
           export NEXT_PUBLIC_CHAIN="${NEXT_PUBLIC_CHAIN:-testnet}"
           export NEXT_PUBLIC_SCOOP_DIAMOND="${NEXT_PUBLIC_SCOOP_DIAMOND:-0xfB2678ff49967B073F6537781EC3d35DE731a5DF}"
@@ -60,7 +64,7 @@ jobs:
           export NEXT_PUBLIC_SOLANA_CLUSTER="${NEXT_PUBLIC_SOLANA_CLUSTER:-devnet}"
           export NEXT_PUBLIC_SOLANA_PROGRAM_ID="${NEXT_PUBLIC_SOLANA_PROGRAM_ID:-FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT}"
           export NEXT_PUBLIC_SOLANA_RPC="${NEXT_PUBLIC_SOLANA_RPC:-https://api.devnet.solana.com}"
-          echo "Building for chain=${NEXT_PUBLIC_CHAIN} basePath=${NEXT_PUBLIC_BASE_PATH} solana=${NEXT_PUBLIC_SOLANA_CLUSTER}"
+          echo "Building for chain=${NEXT_PUBLIC_CHAIN} basePath=${NEXT_PUBLIC_BASE_PATH} solana=${NEXT_PUBLIC_SOLANA_CLUSTER} wc=${NEXT_PUBLIC_WC_PROJECT_ID:+set}"
           pnpm build
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

@@ -2,9 +2,10 @@
    Flat canvas, hairline boxes, 6px corners, system sans + mono numbers.
    Colour: green = go/progress, blue = links, amber = pending, red = danger. */
 
+/* Co-located under src/app so webpack emits URLs with assetPrefix/basePath. */
 @font-face {
   font-family: "Anybody";
-  src: url(/fonts/anybody.woff2) format("woff2");
+  src: url(./fonts/anybody.woff2) format("woff2");
   font-weight: 100 900;
   font-stretch: 50% 150%;
   font-display: swap;
@@ -12,7 +13,7 @@
 
 @font-face {
   font-family: "JetBrains Mono";
-  src: url(/fonts/jetbrains-mono.woff2) format("woff2");
+  src: url(./fonts/jetbrains-mono.woff2) format("woff2");
   font-weight: 100 800;
   font-display: swap;
 }
