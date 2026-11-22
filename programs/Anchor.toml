@@ -1,0 +1,22 @@
+[toolchain]
+anchor_version = "0.32.1"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+scoop = "FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT"
+
+[programs.devnet]
+scoop = "FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "cargo test -p scoop -- --nocapture"

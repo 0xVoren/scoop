@@ -1,0 +1,213 @@
+{
+  "address": "FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT",
+  "metadata": {
+    "name": "scoop",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Scoop raffle program — SlotHashes draw, native SOL + classic SPL. Hand-authored from programs/ (no anchor idl build artifact)."
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "accounts": [
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "config", "writable": true },
+        { "name": "pending", "writable": true },
+        { "name": "system_program" }
+      ],
+      "args": [
+        { "name": "fee_recipient", "type": "pubkey" },
+        { "name": "protocol_config", "type": { "defined": { "name": "ProtocolConfig" } } }
+      ]
+    },
+    {
+      "name": "create_raffle",
+      "discriminator": [226, 206, 159, 34, 213, 207, 98, 126],
+      "accounts": [
+        { "name": "creator", "writable": true, "signer": true },
+        { "name": "config", "writable": true },
+        { "name": "raffle", "writable": true },
+        { "name": "share_board", "writable": true },
+        { "name": "creator_prize_ata", "writable": true, "optional": true },
+        { "name": "prize_vault_ata", "writable": true, "optional": true },
+        { "name": "token_program", "optional": true },
+        { "name": "system_program" }
+      ],
+      "args": [
+        { "name": "prize_mint", "type": "pubkey" },
+        { "name": "payment_mint", "type": "pubkey" },
+        { "name": "prize_amount", "type": "u64" },
+        { "name": "price_per_share", "type": "u64" },
+        { "name": "total_shares", "type": "u32" },
+        { "name": "deadline", "type": "i64" },
+        { "name": "draw_delay_slots", "type": "u32" }
+      ]
+    },
+    {
+      "name": "buy_shares",
+      "discriminator": [40, 239, 138, 154, 8, 37, 106, 108],
+      "accounts": [
+        { "name": "buyer", "writable": true, "signer": true },
+        { "name": "raffle", "writable": true },
+        { "name": "share_board", "writable": true },
+        { "name": "buyer_record", "writable": true },
+        { "name": "pending", "writable": true },
+        { "name": "buyer_payment_ata", "writable": true, "optional": true },
+        { "name": "payment_vault_ata", "writable": true, "optional": true },
+        { "name": "token_program", "optional": true },
+        { "name": "system_program" }
+      ],
+      "args": [{ "name": "count", "type": "u32" }]
+    },
+    {
+      "name": "draw",
+      "discriminator": [61, 40, 62, 184, 31, 176, 24, 130],
+      "accounts": [
+        { "name": "caller", "signer": true },
+        { "name": "raffle", "writable": true },
+        { "name": "share_board" },
+        { "name": "pending", "writable": true },
+        { "name": "slot_hashes" }
+      ],
+      "args": []
+    },
+    {
+      "name": "draw_many",
+      "discriminator": [44, 84, 107, 122, 142, 41, 2, 199],
+      "accounts": [
+        { "name": "caller", "signer": true },
+        { "name": "pending", "writable": true },
+        { "name": "slot_hashes" }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_prize",
+      "discriminator": [157, 233, 139, 121, 246, 62, 234, 235],
+      "accounts": [
+        { "name": "winner", "writable": true, "signer": true },
+        { "name": "raffle", "writable": true },
+        { "name": "share_board" },
+        { "name": "prize_vault_ata", "writable": true, "optional": true },
+        { "name": "winner_prize_ata", "writable": true, "optional": true },
+        { "name": "token_program", "optional": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_proceeds",
+      "discriminator": [44, 76, 121, 111, 124, 251, 237, 5],
+      "accounts": [
+        { "name": "creator", "writable": true, "signer": true },
+        { "name": "config" },
+        { "name": "raffle", "writable": true },
+        { "name": "fee_recipient", "writable": true },
+        { "name": "payment_vault_ata", "writable": true, "optional": true },
+        { "name": "fee_recipient_ata", "writable": true, "optional": true },
+        { "name": "creator_payment_ata", "writable": true, "optional": true },
+        { "name": "token_program", "optional": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "refund",
+      "discriminator": [2, 96, 183, 251, 63, 208, 46, 46],
+      "accounts": [
+        { "name": "buyer", "writable": true, "signer": true },
+        { "name": "raffle", "writable": true },
+        { "name": "buyer_record", "writable": true },
+        { "name": "pending", "writable": true },
+        { "name": "payment_vault_ata", "writable": true, "optional": true },
+        { "name": "buyer_payment_ata", "writable": true, "optional": true },
+        { "name": "token_program", "optional": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "recover_prize",
+      "discriminator": [202, 95, 255, 238, 130, 236, 34, 215],
+      "accounts": [
+        { "name": "creator", "writable": true, "signer": true },
+        { "name": "raffle", "writable": true },
+        { "name": "pending", "writable": true },
+        { "name": "prize_vault_ata", "writable": true, "optional": true },
+        { "name": "creator_prize_ata", "writable": true, "optional": true },
+        { "name": "token_program", "optional": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_share_board",
+      "discriminator": [92, 20, 93, 186, 6, 116, 144, 159],
+      "accounts": [
+        { "name": "recipient", "writable": true, "signer": true },
+        { "name": "raffle" },
+        { "name": "share_board", "writable": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_buyer_record",
+      "discriminator": [27, 105, 238, 144, 158, 212, 40, 114],
+      "accounts": [
+        { "name": "recipient", "writable": true, "signer": true },
+        { "name": "raffle" },
+        { "name": "buyer" },
+        { "name": "buyer_record", "writable": true }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Config",
+      "discriminator": [155, 12, 170, 224, 30, 250, 204, 130]
+    },
+    {
+      "name": "Raffle",
+      "discriminator": [143, 133, 63, 173, 138, 10, 142, 200]
+    },
+    {
+      "name": "ShareBoard",
+      "discriminator": [202, 172, 178, 165, 183, 246, 37, 135]
+    },
+    {
+      "name": "BuyerRecord",
+      "discriminator": [107, 122, 54, 31, 4, 54, 209, 38]
+    },
+    {
+      "name": "PendingDraws",
+      "discriminator": [53, 243, 238, 127, 176, 81, 160, 103]
+    }
+  ],
+  "types": [
+    {
+      "name": "ProtocolConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "allow_different_tokens", "type": "bool" },
+          { "name": "allow_custom_shares", "type": "bool" },
+          { "name": "allow_custom_price", "type": "bool" },
+          { "name": "allow_custom_draw_delay", "type": "bool" },
+          { "name": "default_shares", "type": "u32" },
+          { "name": "price_divisor", "type": "u32" },
+          { "name": "default_draw_delay_slots", "type": "u32" }
+        ]
+      }
+    },
+    {
+      "name": "RaffleStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Selling" },
+          { "name": "SoldOut" },
+          { "name": "Drawn" },
+          { "name": "Expired" }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+[package]
+name = "scoop"
+version = "0.1.0"
+description = "Scoop raffle protocol — Solana Anchor MVP (EVM-equivalent semantics)"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "scoop"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+# Anchor / Solana macros emit these cfgs; declare so rustc check-cfg stops warning.
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+
+[dependencies]
+anchor-lang = { version = "=0.32.1", features = ["init-if-needed"] }
+# default-features=false: avoid Token-2022 / zk-sdk pulling edition2024 deps (platform-tools cargo < 1.85)
+anchor-spl = { version = "=0.32.1", default-features = false, features = ["token"] }
+# Anchor 0.32+ no longer re-exports hash/keccak from solana_program
+solana-keccak-hasher = "2.2"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }
+
+[dev-dependencies]

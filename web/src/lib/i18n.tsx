@@ -1,0 +1,487 @@
+'use client'
+
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+
+export type Locale = 'zh' | 'en'
+
+const STORAGE_KEY = 'scoop.locale'
+
+const dict = {
+  zh: {
+    navAria: '主导航',
+    navRaffles: '热卖',
+    navCreate: '创建',
+    navMe: '我的',
+    meTitle: '我的',
+    meLead:
+      '待办在上（开奖 / 领奖 / 领销售收入 / 退款），历史在下。购买记录按链上 SharesPurchased 事件索引。',
+    meLeadSolana: 'Solana 暂无购买事件索引；请用场次 #ID 打开详情完成开奖 / 领奖 / 退款。',
+    meConnect: '请先连接钱包，查看你买过的场次。',
+    meLoading: '加载中…',
+    meEmpty: '暂无记录。去热卖买几份，或创建一场。',
+    meSolanaNoIndex: 'Solana MVP 没有 SharesPurchased 事件索引，无法列出「我的购买」。',
+    meSolanaHint: '创建后记下场次 ID，或从热卖列表进入详情。返回',
+    meCreatedLink: '我创建的全部场次',
+    meActionable: '待处理',
+    meHistory: '历史',
+    meLoadMore: '加载更早记录',
+    meCreatorTag: '我创建的',
+    solanaNoSecondaryIndex: 'Solana MVP 没有创建者 / 奖池币次级索引。',
+    solanaOpenById: '请用场次 #ID 打开详情。返回',
+    outcomeWon: '中奖',
+    outcomeLost: '未中',
+    outcomePending: '待开奖',
+    langZh: '中文',
+    langEn: 'EN',
+    langToggle: '切换语言',
+    searchPlaceholder: '搜索场次 #ID / 地址',
+    searchAria: '搜索场次或地址',
+    searchOpen: '搜索',
+    connect: '连接钱包',
+    connecting: '连接中…',
+    connectShort: '连接',
+    themeToggle: '切换浅色 / 深色',
+    walletAria: '连接钱包',
+    walletConnected: '钱包 {a}',
+
+    homeTitle: '热卖场次',
+    homeLead: '只显示可买入或待开奖的场次。已开奖 / 已过期请进「我的」或搜索场次 ID。',
+    homeLeadSolana: '只显示可买入或待开奖的场次（顺序扫近期 id，非完整索引）。已结束请搜场次 #ID。',
+    homeCreate: '创建场次',
+    homeLoading: '加载场次…',
+    homeEmpty: '暂无场次。部署合约并设置 NEXT_PUBLIC_SCOOP_DIAMOND 后，去创建第一场。',
+    homeEmptySolana: '暂无场次。部署程序并设置 NEXT_PUBLIC_SOLANA_PROGRAM_ID 后，去创建第一场。',
+    homeEmptyActive: '当前没有热卖或待开奖场次。已结束的记录在',
+    homeSolanaIndexHint: '列表为顺序扫描近期 raffle id，不是全站索引；更早场次请直接搜 #ID。',
+    homeLoadMore: '加载更多',
+    aboutTitle: '关于',
+    aboutBody:
+      '类似一元夺宝的链上玩法：托管奖池、拆成固定份数出售，售罄后若干区块用 blockhash 抽中一份，赢家拿走全部奖池。',
+    aboutBodySolana:
+      '类似一元夺宝的链上玩法：托管奖池、拆成固定份数出售，售罄后若干 slot 用 SlotHashes 抽中一份，赢家拿走全部奖池。',
+    aboutCreate: '创建一场',
+    aboutMe: '我的购买与中奖',
+    contractTitle: '合约',
+    contractUnset: '未配置 NEXT_PUBLIC_SCOOP_DIAMOND',
+    programTitle: '程序',
+    programUnset: '未配置 NEXT_PUBLIC_SOLANA_PROGRAM_ID',
+    rulesTitle: '规则',
+    rulesBody:
+      '启动配置：同币买卖 · 11 份 · 单价 = 奖池 / 10 · N = 5。首页只展示进行中场次；结算后在「我的」查看。',
+    rulesBodySolana:
+      '启动配置：同币买卖 · 11 份 · 单价 = 奖池 / 10 · N = 5（slot）。首页顺序扫近期场次；结算后请搜 #ID。',
+    sideAria: '关于 Scoop',
+    errRejected: '已取消签名',
+    errInsufficient: '余额不足',
+    errWrongChain: '请切换到正确的网络',
+    errFeeOnTransfer: '该代币实际到账少于请求额（扣费/税币）。Scoop 拒绝此类资产。',
+    errToken2022: '不支持 Token-2022。请使用经典 SPL Token。',
+    assetPolicyFoTHint: '链上拒绝 fee-on-transfer / 税币（到账必须足额）。',
+    assetPolicyToken2022Hint: 'Solana：仅经典 SPL Token；Token-2022 会被拒绝。',
+    assetPolicySolanaIndexHint: 'Solana 列表只顺序扫近期 id，不是全站索引；更早场次请搜 #ID。',
+    viewTx: '查看交易',
+    copyLink: '复制链接',
+    copyLinkOk: '链接已复制',
+    copyAddrOk: '地址已复制',
+    copyAddrFail: '复制失败',
+    viewExplorer: '浏览器',
+    meLogsFallback: '事件查询失败，已回退为扫描近期场次（可能不全）。',
+    buyCost: '合计 {a} {token}',
+    buyBalanceLow: '余额不足',
+    drawWaitBlocks: '还需约 {n} 块',
+    drawWaitSlots: '还需约 {n} 个 slot',
+    drawReady: '可以开奖',
+    shareCountAria: '买入份数',
+    userLoading: '加载创建记录…',
+    tokenLoading: '加载场次…',
+
+    createTitle: '创建场次',
+    createLead:
+      '托管奖池并开售。当前协议默认：同币、固定 11 份、单价=奖池/10；灰色项为锁定默认值，后续可由管理员逐步放开。',
+    createParams: '参数',
+    createPrizeToken: '奖池代币（BNB 或合约地址）',
+    createPrizeTokenSol: '奖池代币（SOL 或 mint）',
+    createPaymentToken: '买份代币',
+    createPrizeAmount: '奖池数量',
+    createPrice: '每份价格',
+    createShares: '总份数',
+    createDeadline: '截止（小时后）',
+    createDelay: '开奖等待区块数 N',
+    createDelaySlots: '开奖等待 slot 数 N',
+    createHint: '创建者售罄后收买份总额 99%（协议 1%）。中奖者拿满奖池。原生哨兵：',
+    createSubmit: '创建场次',
+    createSubmitting: '提交中…',
+    createLoadingCfg: '加载协议配置…',
+    createAllCustom: '全部参数可自定义',
+    createLockSame: '同币买卖',
+    createLockShares: '{n} 份固定',
+    createLockPrice: '单价=奖池/{d}',
+    createLockDelay: 'N={n}',
+    toastConnect: '请先连接钱包',
+    toastCfg: '配置未加载',
+    toastAmount: '金额必须大于 0',
+    toastDivisible: '奖池数量需能被 {d} 整除',
+    toastCreated: '创建成功 #{id}',
+    toastCreatedOk: '创建成功',
+    toastCreateFail: '创建失败',
+
+    backRaffles: '← 场次',
+    detailLoading: '加载中…',
+    detailMissing: '场次不存在',
+    detailSold: '份已售',
+    detailBox: '详情',
+    detailActions: '操作',
+    detailPrize: '奖池',
+    detailPrice: '单价',
+    detailProgress: '进度',
+    detailDeadline: '截止',
+    detailCreator: '创建者',
+    detailPrizeToken: '奖池币',
+    detailDelay: '开奖延迟 N',
+    detailBlocks: '{n} 块',
+    detailSlots: '{n} 个 slot',
+
+    cardPerShare: '/ 份 · 共 {n} 份',
+    cardDeadline: '· 截止 {d}',
+
+    myShares: '我的份额：',
+    approveMax: '授权 Max',
+    approved: '已授权',
+    approving: '授权中…',
+    toastApproveOk: '授权成功（Max）',
+    toastApproveFail: '授权失败',
+    toastNeedApprove: '请先点击「授权 Max」',
+    buy: '买入（剩余 {n}）',
+    draw: '开奖（≥ 块 {n}）',
+    drawSlot: '开奖（≥ slot {n}）',
+    claimPrize: '领取奖池（100%）',
+    claimProceeds: '领取销售收入（扣 1% 协议费）',
+    claimProceedsHint: '筹集 {raised} {token} · 协议费 {fee} · 到手 {net}',
+    refund: '退款',
+    toastSharesRange: '份数须在 {min}–{max}',
+    toastDelayRange: '开奖延迟须在 {min}–{max}',
+    recover: '取回奖池',
+    winner: '中奖地址：',
+    toastSharesInvalid: '份数无效',
+    toastSharesLeft: '剩余份数不足',
+    toastBuyOk: '购买成功',
+    toastBuyFail: '购买失败',
+    toastDrawWait: '还需等待开奖，目标块 {need}，当前 {now}',
+    toastDrawWaitSlot: '还需等待开奖，目标 slot {need}，当前 {now}',
+    toastDrawOk: '开奖完成',
+    toastDrawFail: '开奖失败',
+    toastPrizeOk: '奖池已领取（无手续费）',
+    toastClaimFail: '领取失败',
+    toastProceedsOk: '销售收入已领取（含 1% 协议费）',
+    toastRefundOk: '退款成功',
+    toastRefundFail: '退款失败',
+    toastRecoverOk: '奖池已取回',
+    toastRecoverFail: '取回失败',
+
+    userTitle: '创建者 {a}',
+    userLead: '创建了 {n} 场 · 进行中优先，已结束折叠在下方',
+    userEmpty: '该地址暂无创建记录',
+    userActive: '进行中',
+    userSettled: '已结束',
+    tokenTitle: '奖池币 {token}',
+    tokenLead: '进行中场次（已开奖/过期不展示，搜 #ID 可查）',
+    tokenEmpty: '该代币下暂无进行中场次',
+
+    statusSelling: '热卖中',
+    statusSoldOut: '待开奖',
+    statusDrawn: '已开奖',
+    statusExpired: '已过期',
+    statusUnknown: '未知',
+
+    footBrand: 'Scoop · BSC 份额夺宝',
+    footRule: '中奖者拿满奖池 · 创建者收 99% 销售收入',
+
+    switchChain: '切换到 {n}',
+    disconnect: '断开',
+    chainSwitchAria: '切换链',
+    chainFamilyEvm: 'EVM',
+    chainFamilySolana: 'Solana',
+    chainSolanaStub: 'Solana：连接钱包后可创建/购买/开奖/领取',
+  },
+  en: {
+    navAria: 'Main navigation',
+    navRaffles: 'Live',
+    navCreate: 'Create',
+    navMe: 'Me',
+    meTitle: 'Me',
+    meLead:
+      'Needs action first (draw / claim prize / claim proceeds / refund), then history. Purchases indexed via SharesPurchased events.',
+    meLeadSolana:
+      'Solana has no purchase event index yet — open a raffle by #ID to draw / claim / refund.',
+    meConnect: 'Connect a wallet to see your raffles.',
+    meLoading: 'Loading…',
+    meEmpty: 'Nothing yet. Buy shares on Live, or create a raffle.',
+    meSolanaNoIndex:
+      'Solana MVP has no SharesPurchased event index, so “My purchases” cannot be listed.',
+    meSolanaHint: 'Remember the raffle ID after create, or open it from Live. Back to',
+    meCreatedLink: 'All raffles I created',
+    meActionable: 'Needs action',
+    meHistory: 'History',
+    meLoadMore: 'Load older',
+    meCreatorTag: 'Created by me',
+    solanaNoSecondaryIndex: 'Solana MVP has no creator / prize-token secondary indexes.',
+    solanaOpenById: 'Open a raffle by #ID. Back to',
+    outcomeWon: 'Won',
+    outcomeLost: 'Lost',
+    outcomePending: 'Pending draw',
+    langZh: '中文',
+    langEn: 'EN',
+    langToggle: 'Switch language',
+    searchPlaceholder: 'Search raffle #ID / address',
+    searchAria: 'Search raffles or addresses',
+    searchOpen: 'Search',
+    connect: 'Connect wallet',
+    connecting: 'Connecting…',
+    connectShort: 'Connect',
+    themeToggle: 'Switch light or dark',
+    walletAria: 'Connect a wallet',
+    walletConnected: 'Wallet {a}',
+
+    homeTitle: 'Live raffles',
+    homeLead:
+      'Only buyable or awaiting-draw raffles. Settled ones live under Me, or search by raffle ID.',
+    homeLeadSolana:
+      'Only buyable or awaiting-draw raffles (recent ids scanned sequentially — not a full index). Settled: search by #ID.',
+    homeCreate: 'Create raffle',
+    homeLoading: 'Loading raffles…',
+    homeEmpty:
+      'No raffles yet. Deploy the diamond and set NEXT_PUBLIC_SCOOP_DIAMOND, then create the first one.',
+    homeEmptySolana:
+      'No raffles yet. Deploy the program and set NEXT_PUBLIC_SOLANA_PROGRAM_ID, then create the first one.',
+    homeEmptyActive: 'Nothing live right now. Settled records are under',
+    homeSolanaIndexHint:
+      'List scans recent raffle ids in order — not a full site index. Older raffles: search by #ID.',
+    homeLoadMore: 'Load more',
+    aboutTitle: 'About',
+    aboutBody:
+      'On-chain share raffle: escrow a prize, sell a fixed number of shares, then draw with blockhash after N blocks. One share wins the whole prize.',
+    aboutBodySolana:
+      'On-chain share raffle: escrow a prize, sell a fixed number of shares, then draw with SlotHashes after N slots. One share wins the whole prize.',
+    aboutCreate: 'Create one',
+    aboutMe: 'My purchases & wins',
+    contractTitle: 'Contract',
+    contractUnset: 'NEXT_PUBLIC_SCOOP_DIAMOND not set',
+    programTitle: 'Program',
+    programUnset: 'NEXT_PUBLIC_SOLANA_PROGRAM_ID not set',
+    rulesTitle: 'Rules',
+    rulesBody:
+      'Launch defaults: same token · 11 shares · price = prize / 10 · N = 5. Home shows live raffles only; check Me after settlement.',
+    rulesBodySolana:
+      'Launch defaults: same token · 11 shares · price = prize / 10 · N = 5 (slots). Home scans recent ids; after settlement search by #ID.',
+    sideAria: 'About Scoop',
+    errRejected: 'Signature cancelled',
+    errInsufficient: 'Insufficient balance',
+    errWrongChain: 'Switch to the correct network',
+    errFeeOnTransfer:
+      'This token transfers less than requested (fee-on-transfer / tax). Scoop rejects it.',
+    errToken2022: 'Token-2022 is not supported. Use classic SPL Token.',
+    assetPolicyFoTHint: 'Fee-on-transfer and tax tokens are rejected on-chain.',
+    assetPolicyToken2022Hint: 'Solana: classic SPL Token only — Token-2022 is rejected.',
+    assetPolicySolanaIndexHint:
+      'Solana lists scan recent ids only — not a full index. Older raffles: search #ID.',
+    viewTx: 'View tx',
+    copyLink: 'Copy link',
+    copyLinkOk: 'Link copied',
+    copyAddrOk: 'Address copied',
+    copyAddrFail: 'Copy failed',
+    viewExplorer: 'Explorer',
+    meLogsFallback: 'Event query failed; fell back to scanning recent raffles (may be incomplete).',
+    buyCost: 'Total {a} {token}',
+    buyBalanceLow: 'Insufficient balance',
+    drawWaitBlocks: '~{n} blocks left',
+    drawWaitSlots: '~{n} slots left',
+    drawReady: 'Ready to draw',
+    shareCountAria: 'Share count',
+    userLoading: 'Loading created raffles…',
+    tokenLoading: 'Loading raffles…',
+
+    createTitle: 'Create raffle',
+    createLead:
+      'Escrow a prize and open sales. Protocol defaults: same token, fixed 11 shares, price = prize/10. Grey fields are locked defaults until the owner opens them.',
+    createParams: 'Parameters',
+    createPrizeToken: 'Prize token (BNB or address)',
+    createPrizeTokenSol: 'Prize token (SOL or mint)',
+    createPaymentToken: 'Payment token',
+    createPrizeAmount: 'Prize amount',
+    createPrice: 'Price per share',
+    createShares: 'Total shares',
+    createDeadline: 'Deadline (hours from now)',
+    createDelay: 'Draw delay blocks N',
+    createDelaySlots: 'Draw delay slots N',
+    createHint:
+      'Creator receives 99% of sales (1% protocol fee). Winner takes the full prize. Native sentinel:',
+    createSubmit: 'Create raffle',
+    createSubmitting: 'Submitting…',
+    createLoadingCfg: 'Loading protocol config…',
+    createAllCustom: 'All parameters are customizable',
+    createLockSame: 'Same-token only',
+    createLockShares: '{n} shares fixed',
+    createLockPrice: 'Price = prize/{d}',
+    createLockDelay: 'N={n}',
+    toastConnect: 'Connect wallet first',
+    toastCfg: 'Config not loaded',
+    toastAmount: 'Amount must be > 0',
+    toastDivisible: 'Prize amount must be divisible by {d}',
+    toastCreated: 'Created #{id}',
+    toastCreatedOk: 'Created',
+    toastCreateFail: 'Create failed',
+
+    backRaffles: '← Raffles',
+    detailLoading: 'Loading…',
+    detailMissing: 'Raffle not found',
+    detailSold: 'shares sold',
+    detailBox: 'Details',
+    detailActions: 'Actions',
+    detailPrize: 'Prize',
+    detailPrice: 'Price',
+    detailProgress: 'Progress',
+    detailDeadline: 'Deadline',
+    detailCreator: 'Creator',
+    detailPrizeToken: 'Prize token',
+    detailDelay: 'Draw delay N',
+    detailBlocks: '{n} blocks',
+    detailSlots: '{n} slots',
+
+    cardPerShare: '/ share · {n} total',
+    cardDeadline: '· ends {d}',
+
+    myShares: 'My shares: ',
+    approveMax: 'Approve Max',
+    approved: 'Approved',
+    approving: 'Approving…',
+    toastApproveOk: 'Approved (max)',
+    toastApproveFail: 'Approve failed',
+    toastNeedApprove: 'Tap “Approve Max” first',
+    buy: 'Buy ({n} left)',
+    draw: 'Draw (≥ block {n})',
+    drawSlot: 'Draw (≥ slot {n})',
+    claimPrize: 'Claim prize (100%)',
+    claimProceeds: 'Claim proceeds (1% fee)',
+    claimProceedsHint: 'Raised {raised} {token} · fee {fee} · net {net}',
+    refund: 'Refund',
+    toastSharesRange: 'Shares must be {min}–{max}',
+    toastDelayRange: 'Draw delay must be {min}–{max}',
+    recover: 'Recover prize',
+    winner: 'Winner: ',
+    toastSharesInvalid: 'Invalid share count',
+    toastSharesLeft: 'Not enough shares left',
+    toastBuyOk: 'Purchase successful',
+    toastBuyFail: 'Purchase failed',
+    toastDrawWait: 'Wait for draw: need block {need}, now {now}',
+    toastDrawWaitSlot: 'Wait for draw: need slot {need}, now {now}',
+    toastDrawOk: 'Drawn',
+    toastDrawFail: 'Draw failed',
+    toastPrizeOk: 'Prize claimed (no fee)',
+    toastClaimFail: 'Claim failed',
+    toastProceedsOk: 'Proceeds claimed (1% protocol fee)',
+    toastRefundOk: 'Refunded',
+    toastRefundFail: 'Refund failed',
+    toastRecoverOk: 'Prize recovered',
+    toastRecoverFail: 'Recover failed',
+
+    userTitle: 'Creator {a}',
+    userLead: 'Created {n} raffles · live first, settled below',
+    userEmpty: 'No raffles from this address',
+    userActive: 'Live',
+    userSettled: 'Settled',
+    tokenTitle: 'Prize token {token}',
+    tokenLead: 'Live raffles only (settled hidden; search #ID)',
+    tokenEmpty: 'No live raffles for this token',
+
+    statusSelling: 'Selling',
+    statusSoldOut: 'Pending draw',
+    statusDrawn: 'Drawn',
+    statusExpired: 'Expired',
+    statusUnknown: 'Unknown',
+
+    footBrand: 'Scoop · BSC share raffle',
+    footRule: 'Winner takes the prize · creator keeps 99% of sales',
+
+    switchChain: 'Switch to {n}',
+    disconnect: 'Disconnect',
+    chainSwitchAria: 'Switch chain',
+    chainFamilyEvm: 'EVM',
+    chainFamilySolana: 'Solana',
+    chainSolanaStub: 'Solana: connect wallet to create/buy/draw/claim',
+  },
+} as const
+
+export type MessageKey = keyof typeof dict.zh
+
+type Vars = Record<string, string | number>
+
+type I18nValue = {
+  locale: Locale
+  setLocale: (locale: Locale) => void
+  t: (key: MessageKey, vars?: Vars) => string
+}
+
+const I18nContext = createContext<I18nValue | null>(null)
+
+function format(template: string, vars?: Vars): string {
+  if (!vars) return template
+  return template.replace(/\{(\w+)\}/g, (_, k: string) =>
+    vars[k] === undefined ? `{${k}}` : String(vars[k]),
+  )
+}
+
+export function LocaleProvider({ children }: { children: ReactNode }) {
+  const [locale, setLocaleState] = useState<Locale>('zh')
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY) as Locale | null
+      if (saved === 'zh' || saved === 'en') {
+        setLocaleState(saved)
+        return
+      }
+    } catch {
+      // ignore
+    }
+    if (typeof navigator !== 'undefined' && !navigator.language.toLowerCase().startsWith('zh')) {
+      setLocaleState('en')
+    }
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.lang = locale === 'zh' ? 'zh-CN' : 'en'
+  }, [locale])
+
+  const setLocale = useCallback((next: Locale) => {
+    setLocaleState(next)
+    try {
+      localStorage.setItem(STORAGE_KEY, next)
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  const t = useCallback((key: MessageKey, vars?: Vars) => format(dict[locale][key], vars), [locale])
+
+  const value = useMemo(() => ({ locale, setLocale, t }), [locale, setLocale, t])
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
+}
+
+export function useI18n() {
+  const ctx = useContext(I18nContext)
+  if (!ctx) throw new Error('useI18n must be used within LocaleProvider')
+  return ctx
+}
+
+export function useT() {
+  return useI18n().t
+}

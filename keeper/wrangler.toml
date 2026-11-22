@@ -1,0 +1,30 @@
+# Scoop pendingDraw keeper (Cloudflare Workers + Cron). Secrets via wrangler secret.
+name = "scoop-keeper"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[triggers]
+# Fallback: scan pendingDraw every minute; drawMany only when ready.
+crons = ["* * * * *"]
+
+[vars]
+# evm | solana — which chain this worker ticks
+KEEPER_CHAIN = "evm"
+# --- EVM ---
+# local | testnet | mainnet
+CHAIN = "local"
+DIAMOND_ADDRESS = "0x0000000000000000000000000000000000000000"
+# Local vars ok; RPC URLs with API keys should use secret RPC_URL
+RPC_URL = "http://127.0.0.1:8545"
+# --- Solana (when KEEPER_CHAIN=solana) ---
+# SOLANA_RPC_URL / SOLANA_PROGRAM_ID as vars; put SOLANA_KEEPER_KEYPAIR via `wrangler secret`
+# Localnet:
+SOLANA_RPC_URL = "http://127.0.0.1:8899"
+SOLANA_PROGRAM_ID = "FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT"
+# Devnet example (uncomment + set KEEPER_CHAIN = "solana"; never put keypair JSON here):
+# SOLANA_RPC_URL = "https://api.devnet.solana.com"
+# SOLANA_PROGRAM_ID = "FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT"

@@ -1,0 +1,31 @@
+{
+  "name": "scoop-keeper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Scoop pendingDraw keeper — polls ready raffles and calls drawMany",
+  "scripts": {
+    "tick": "tsx src/cli.ts",
+    "dev": "wrangler dev --test-scheduled",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit && tsc -p ../scripts/tsconfig.json",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "tail": "wrangler tail",
+    "tick:solana": "KEEPER_CHAIN=solana tsx src/cli.ts"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.4",
+    "viem": "^2.51.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "@types/node": "22.15.30",
+    "@vitest/coverage-v8": "^4.1.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5",
+    "vitest": "^4.1.0",
+    "wrangler": "^4"
+  }
+}

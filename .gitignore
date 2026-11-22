@@ -1,0 +1,26 @@
+.superpowers/
+.worktrees/
+.pnpm-store/
+contracts/cache/
+contracts/out/
+contracts/broadcast/
+contracts/lcov.info
+keeper/coverage/
+programs/target/
+*.profraw
+*.profdata
+# Foundry deps only (do not ignore web/src/lib)
+/lib/
+contracts/lib/
+!web/src/lib/
+.tmp-fork-ref/
+keeper/node_modules/
+keeper/.dev.vars
+keeper/.wrangler/
+
+# Secrets / local env (defense in depth; package gitignores also apply)
+.env
+.env.*
+!.env.example
+**/.env.local
+**/*.pem
