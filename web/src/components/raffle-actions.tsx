@@ -14,8 +14,10 @@ import {
 } from 'wagmi'
 import { scoopAbi } from '@/abi/scoop'
 import type { EvmRaffleView } from '@/chain/adapters/evm'
+import { solanaProgramId } from '@/chain/env'
 import { useChainFamily } from '@/chain/selection'
-import { isNativeMint } from '@/chain/solana/constants'
+import { rememberBoughtRaffleId } from '@/chain/solana/buyer-cache'
+import { DEFAULT_PROGRAM_ID, isNativeMint } from '@/chain/solana/constants'
 import { useSolanaWrites } from '@/chain/solana/useSolanaWrites'
 import { useBuyerRefunded, useShareCount, useShareOwner } from '@/hooks/useRaffle'
 import { useRequireChain } from '@/hooks/useRequireChain'
@@ -142,6 +144,12 @@ function SolanaRaffleActions({
       if (label === 'buy') {
         const { signature } = await writes.buy(orderId, Number(count))
         toastTxOk(t('toastBuyOk'), signature, t('viewTx'))
+        // Cache raffle id so Me can recover if getProgramAccounts is blocked.
+        rememberBoughtRaffleId(
+          solanaProgramId() || DEFAULT_PROGRAM_ID,
+          publicKey.toBase58(),
+          orderId,
+        )
       } else if (label === 'draw') {
         const { signature } = await writes.draw(orderId)
         toastTxOk(t('toastDrawOk'), signature, t('viewTx'))

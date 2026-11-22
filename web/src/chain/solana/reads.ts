@@ -1,5 +1,8 @@
 import type { Connection } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
+import { readBoughtRaffleIds } from '@/chain/solana/buyer-cache'
+import { buyerRecordFiltersForBuyer } from '@/chain/solana/buyer-filters'
+import { RaffleStatus } from '@/chain/solana/constants'
 import {
   type BuyerRecordAccount,
   type ConfigAccount,
@@ -13,6 +16,9 @@ import {
 } from '@/chain/solana/decode'
 import { buyerRecordPda, configPda, rafflePda, shareBoardPda } from '@/chain/solana/pdas'
 import type { RaffleReadModel } from '@/chain/types'
+
+/** Default bound for recent-id BuyerRecord probe when GPA fails. */
+const FALLBACK_SCAN_LIMIT = 64
 
 export async function fetchSolanaConfig(
   connection: Connection,
@@ -121,4 +127,100 @@ export async function fetchSolanaShareOwner(
   const board = await fetchSolanaShareBoard(connection, programId, raffleId)
   if (!board || shareIndex < 0 || shareIndex >= board.owners.length) return null
   return board.owners[shareIndex]!.toBase58()
+}
+
+export type SolanaBuyerPurchase = {
+  raffleId: bigint
+  record: BuyerRecordAccount
+  raffle: RaffleReadModel
+  winnerOwner: string | null
+}
+
+/**
+ * Primary discovery: getProgramAccounts filtered by BuyerRecord disc + buyer pubkey.
+ * Fallback when GPA is refused: localStorage raffle ids + bounded recent-id scan.
+ */
+export async function listSolanaBuyerRecordsByBuyer(
+  connection: Connection,
+  programId: PublicKey | string,
+  buyer: PublicKey | string,
+  opts: { fallbackScanLimit?: number } = {},
+): Promise<{
+  records: BuyerRecordAccount[]
+  source: 'gpa' | 'fallback'
+  gpaFailed: boolean
+}> {
+  const pid = typeof programId === 'string' ? new PublicKey(programId) : programId
+  const buyerPk = typeof buyer === 'string' ? new PublicKey(buyer) : buyer
+
+  try {
+    const accounts = await connection.getProgramAccounts(pid, {
+      commitment: 'confirmed',
+      filters: buyerRecordFiltersForBuyer(buyerPk),
+    })
+    const records = accounts.map((a) => decodeBuyerRecord(a.account.data))
+    return { records, source: 'gpa', gpaFailed: false }
+  } catch {
+    // Public RPCs sometimes disable GPA — fall through.
+  }
+
+  const scanLimit = opts.fallbackScanLimit ?? FALLBACK_SCAN_LIMIT
+  const cached = readBoughtRaffleIds(pid.toBase58(), buyerPk.toBase58())
+  const config = await fetchSolanaConfig(connection, pid)
+  const recent: bigint[] = []
+  if (config) {
+    const end = config.nextRaffleId
+    const start = end > BigInt(scanLimit) ? end - BigInt(scanLimit) : 1n
+    for (let id = end - 1n; id >= start; id--) recent.push(id)
+  }
+
+  const seen = new Set<string>()
+  const candidates: bigint[] = []
+  for (const id of [...cached, ...recent]) {
+    const k = id.toString()
+    if (seen.has(k)) continue
+    seen.add(k)
+    candidates.push(id)
+  }
+
+  const records: BuyerRecordAccount[] = []
+  for (const id of candidates) {
+    const rec = await fetchSolanaBuyerRecord(connection, pid, id, buyerPk)
+    if (rec) records.push(rec)
+  }
+  return { records, source: 'fallback', gpaFailed: true }
+}
+
+/** Join BuyerRecords with raffle accounts (+ winner owner when Drawn). */
+export async function listSolanaPurchasesForBuyer(
+  connection: Connection,
+  programId: PublicKey | string,
+  buyer: PublicKey | string,
+): Promise<{
+  purchases: SolanaBuyerPurchase[]
+  source: 'gpa' | 'fallback'
+  gpaFailed: boolean
+}> {
+  const pid = typeof programId === 'string' ? new PublicKey(programId) : programId
+  const { records, source, gpaFailed } = await listSolanaBuyerRecordsByBuyer(connection, pid, buyer)
+
+  const purchases: SolanaBuyerPurchase[] = []
+  for (const record of records) {
+    if (record.shareCount <= 0) continue
+    const raffle = await fetchSolanaRaffleById(connection, pid, record.raffleId)
+    if (!raffle) continue
+    let winnerOwner: string | null = null
+    if (raffle.status === RaffleStatus.Drawn) {
+      winnerOwner = await fetchSolanaShareOwner(
+        connection,
+        pid,
+        record.raffleId,
+        raffle.winnerShareIndex,
+      )
+    }
+    purchases.push({ raffleId: record.raffleId, record, raffle, winnerOwner })
+  }
+
+  purchases.sort((a, b) => (a.raffleId < b.raffleId ? 1 : a.raffleId > b.raffleId ? -1 : 0))
+  return { purchases, source, gpaFailed }
 }

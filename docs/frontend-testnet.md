@@ -80,7 +80,8 @@ Browser smoke checklist:
 1. Open `http://localhost:3010` — home does not report “Diamond not configured”.
 2. EVM: connect MetaMask (BSC Testnet) → list/create pages can read/write Diamond.
 3. Header switch to **Solana** → Phantom/Solflare (devnet) → list/create usable.
-4. Optional: open an existing raffle `/raffle/?id=1` (if that id still exists on-chain).
+4. Solana `/me` with a wallet that bought shares: lists purchases (BuyerRecord GPA); open card to draw/claim/refund without memorizing IDs.
+5. Optional: open an existing raffle `/raffle/?id=1` (if that id still exists on-chain).
 
 Static export preview (optional): `pnpm build && pnpm exec serve out`.
 

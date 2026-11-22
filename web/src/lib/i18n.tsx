@@ -23,12 +23,14 @@ const dict = {
     meTitle: '我的',
     meLead:
       '待办在上（开奖 / 领奖 / 领销售收入 / 退款），历史在下。购买记录按链上 SharesPurchased 事件索引。',
-    meLeadSolana: 'Solana 暂无购买事件索引；请用场次 #ID 打开详情完成开奖 / 领奖 / 退款。',
+    meLeadSolana:
+      '待办在上（开奖 / 领奖 / 退款），历史在下。购买记录通过链上 BuyerRecord 账户发现。',
     meConnect: '请先连接钱包，查看你买过的场次。',
     meLoading: '加载中…',
     meEmpty: '暂无记录。去热卖买几份，或创建一场。',
-    meSolanaNoIndex: 'Solana MVP 没有 SharesPurchased 事件索引，无法列出「我的购买」。',
-    meSolanaHint: '创建后记下场次 ID，或从热卖列表进入详情。返回',
+    meSolanaNoIndex:
+      '当前 RPC 无法扫描 BuyerRecord；已尝试本地缓存与近期场次探测。若仍缺项，请用 #ID 打开详情。',
+    meSolanaHint: '也可从热卖进入详情。返回',
     meCreatedLink: '我创建的全部场次',
     meActionable: '待处理',
     meHistory: '历史',
@@ -220,13 +222,13 @@ const dict = {
     meLead:
       'Needs action first (draw / claim prize / claim proceeds / refund), then history. Purchases indexed via SharesPurchased events.',
     meLeadSolana:
-      'Solana has no purchase event index yet — open a raffle by #ID to draw / claim / refund.',
+      'Needs action first (draw / claim / refund), then history. Purchases discovered via on-chain BuyerRecord accounts.',
     meConnect: 'Connect a wallet to see your raffles.',
     meLoading: 'Loading…',
     meEmpty: 'Nothing yet. Buy shares on Live, or create a raffle.',
     meSolanaNoIndex:
-      'Solana MVP has no SharesPurchased event index, so “My purchases” cannot be listed.',
-    meSolanaHint: 'Remember the raffle ID after create, or open it from Live. Back to',
+      'This RPC could not scan BuyerRecords; tried local cache + recent-id probe. If something is missing, open by #ID.',
+    meSolanaHint: 'Or open from Live. Back to',
     meCreatedLink: 'All raffles I created',
     meActionable: 'Needs action',
     meHistory: 'History',

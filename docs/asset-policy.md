@@ -58,15 +58,17 @@ On-chain Solana MVP does **not** emit EVM-style `SharesPurchased` logs or mainta
 | Surface | Behavior | i18n keys |
 |---|---|---|
 | Home “Live” | Sequential scan of **recent** raffle ids — not a full site index | `homeLeadSolana`, `homeSolanaIndexHint`, `homeEmptySolana` |
-| Me / purchases | Cannot list “my purchases” from an event index | `meLeadSolana`, `meSolanaNoIndex`, `meSolanaHint` |
+| Me / purchases | List via `getProgramAccounts` on `BuyerRecord` PDAs (`["buyer", raffle_id_le, buyer]`); fallback = localStorage ids + bounded recent-id probe when RPC blocks GPA | `meLeadSolana`, `meSolanaNoIndex` (RPC fallback warn only), `meSolanaHint` |
 | Creator / token pages | No secondary index | `solanaNoSecondaryIndex`, `solanaOpenById` |
-| Settled discovery | User searches by raffle **#ID** | `searchPlaceholder`, rules copy `rulesBodySolana` |
+| Settled discovery (non-purchase) | User searches by raffle **#ID** | `searchPlaceholder`, rules copy `rulesBodySolana` |
 
 **Canonical product boundary:**
 
-Solana MVP lists recent raffles by scanning ids; it is not a full indexer. Open settled or older raffles by #ID. “My purchases” and creator/token secondary lists are unavailable until an indexer ships.
+Solana MVP lists recent raffles on Live by scanning ids (not a full site index). “My purchases” is discovered on-chain via BuyerRecord accounts for the connected wallet — no need to memorize raffle IDs. Creator/token secondary lists still need an indexer or #ID search.
 
 EVM keeps event-based purchase indexing (`SharesPurchased`) and creator/token order maps in Diamond storage.
+
+**Residual limits (Solana Me):** some public RPCs disable `getProgramAccounts` (UI falls back + warns); `close_buyer_record` removes the PDA so closed records disappear from history.
 
 ---
 
@@ -80,9 +82,9 @@ Add / keep these keys in `web/src/lib/i18n.tsx` (zh + en). Asset-rejection keys 
 | `errToken2022` | Token-2022 is not supported. Use classic SPL Token. | Solana path hits `UnsupportedTokenProgram` |
 | `assetPolicyFoTHint` | Fee-on-transfer and tax tokens are rejected on-chain. | Create form helper / docs link |
 | `assetPolicyToken2022Hint` | Solana: classic SPL Token only — Token-2022 is rejected. | Create form helper (Solana) |
-| `assetPolicySolanaIndexHint` | Solana lists scan recent ids only — not a full index. Older raffles: search #ID. | Home / Me (may reuse existing `homeSolanaIndexHint`) |
+| `assetPolicySolanaIndexHint` | Solana Live lists scan recent ids only — not a full index. Older non-purchase raffles: search #ID. | Home (may reuse existing `homeSolanaIndexHint`) |
 
-Existing Solana index keys (do not rename): `meSolanaNoIndex`, `meLeadSolana`, `homeSolanaIndexHint`, `solanaNoSecondaryIndex`, `solanaOpenById`, `rulesBodySolana`.
+Existing Solana index keys (do not rename): `meSolanaNoIndex` (now RPC-fallback warn), `meLeadSolana`, `homeSolanaIndexHint`, `solanaNoSecondaryIndex`, `solanaOpenById`, `rulesBodySolana`.
 
 ---
 

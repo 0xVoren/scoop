@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useChainFamily } from '@/chain/selection'
 import { RaffleCard } from '@/components/raffle-card'
 import { useMyPurchases } from '@/hooks/useMyPurchases'
+import { useSolanaMyPurchases } from '@/hooks/useSolanaMyPurchases'
 import { useT } from '@/lib/i18n'
 import { userPath } from '@/lib/paths'
 import { shortAddress } from '@/lib/tokens'
@@ -17,10 +18,14 @@ export default function MePage() {
   const { openConnectModal } = useConnectModal()
   const { publicKey, connected } = useWallet()
   const { setVisible } = useWalletModal()
-  const purchases = useMyPurchases()
+  const evm = useMyPurchases()
+  const sol = useSolanaMyPurchases()
 
   if (family === 'solana') {
     const address = connected ? publicKey?.toBase58() : undefined
+    const { actionable, history, isLoading, refetch, gpaFailed } = sol
+    const hasAny = actionable.length > 0 || history.length > 0
+
     return (
       <>
         <div className="page-h">
@@ -43,22 +48,62 @@ export default function MePage() {
           )}
         </div>
         {!address && <div className="empty">{t('meConnect')}</div>}
-        {address && (
+        {address && isLoading && <div className="empty">{t('meLoading')}</div>}
+        {address && !isLoading && gpaFailed && (
+          <p className="flash warn" style={{ marginBottom: 16 }}>
+            {t('meSolanaNoIndex')}
+          </p>
+        )}
+        {address && !isLoading && !hasAny && (
           <div className="empty">
-            <p className="flash warn" style={{ marginBottom: 12 }}>
-              {t('meSolanaNoIndex')}
-            </p>
-            <p>
+            {t('meEmpty')} <Link href="/">{t('navRaffles')}</Link>
+            <p className="muted small" style={{ marginTop: 8 }}>
               {t('meSolanaHint')} <Link href="/">{t('navRaffles')}</Link>
             </p>
           </div>
+        )}
+
+        {address && !isLoading && actionable.length > 0 && (
+          <section className="me-sect">
+            <h2 className="me-sect-h">{t('meActionable')}</h2>
+            <div className="grid">
+              {actionable.map((p) => (
+                <RaffleCard
+                  key={p.orderId.toString()}
+                  {...p}
+                  myShares={p.myShares}
+                  outcome={p.outcome}
+                  creatorOnly={p.creatorOnly}
+                  onDone={() => void refetch()}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {address && !isLoading && history.length > 0 && (
+          <section className="me-sect">
+            <h2 className="me-sect-h">{t('meHistory')}</h2>
+            <div className="grid">
+              {history.map((p) => (
+                <RaffleCard
+                  key={p.orderId.toString()}
+                  {...p}
+                  myShares={p.myShares}
+                  outcome={p.outcome}
+                  creatorOnly={p.creatorOnly}
+                  onDone={() => void refetch()}
+                />
+              ))}
+            </div>
+          </section>
         )}
       </>
     )
   }
 
   const { actionable, history, isLoading, refetch, address, logsFailed, canLoadMore, loadMore } =
-    purchases
+    evm
   const hasAny = actionable.length > 0 || history.length > 0
 
   return (

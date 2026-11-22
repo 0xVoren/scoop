@@ -21,10 +21,16 @@ export type MyPurchase = ListedRaffle & {
   refunded?: boolean
 }
 
+/** EVM hex is case-insensitive; Solana base58 must stay case-sensitive. */
+export function sameWalletAddress(a: string, b: string): boolean {
+  if (a.startsWith('0x') || b.startsWith('0x')) return a.toLowerCase() === b.toLowerCase()
+  return a === b
+}
+
 /** Still needs user attention: buy more / draw / claim / refund / creator proceeds. */
-export function purchaseNeedsAction(p: MyPurchase, address?: `0x${string}`): boolean {
+export function purchaseNeedsAction(p: MyPurchase, address?: string): boolean {
   const st = effectiveStatus(p.status, p.deadline)
-  const isCreator = Boolean(address && p.creator.toLowerCase() === address.toLowerCase())
+  const isCreator = Boolean(address && sameWalletAddress(p.creator, address))
   if (st === RaffleStatus.Selling) return p.myShares > 0
   if (st === RaffleStatus.SoldOut) return p.myShares > 0 || isCreator
   if (st === RaffleStatus.Expired) {
@@ -242,12 +248,12 @@ export function useMyPurchases() {
       const r = rRow.result as RaffleView
       if (!r.creator || r.creator === '0x0000000000000000000000000000000000000000') continue
 
-      const isCreator = r.creator.toLowerCase() === address.toLowerCase()
+      const isCreator = sameWalletAddress(r.creator, address)
       const st = effectiveStatus(r.status, r.deadline)
       let outcome: PurchaseOutcome = 'pending'
       if (st === RaffleStatus.Drawn && myShares > 0) {
         const w = winnerByOrder.get(scanIds[i].toString())
-        outcome = w && w.toLowerCase() === address.toLowerCase() ? 'won' : 'lost'
+        outcome = w && sameWalletAddress(w, address) ? 'won' : 'lost'
       }
 
       const keepBuyer = myShares > 0

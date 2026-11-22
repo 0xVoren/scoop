@@ -89,8 +89,9 @@ Log in a private ops note (not this repo unless asked):
 ### 4.6 Index / UX boundary (Solana)
 
 - Confirm Live list shows the new id via recent scan.  
-- Confirm Me does **not** claim a full purchase index (`meSolanaNoIndex` / search-by-#ID).  
-- No bug — product boundary per [`asset-policy.md`](asset-policy.md).
+- Confirm Me lists the buyer’s raffle via BuyerRecord GPA (draw / claim / refund reachable without memorizing IDs).  
+- If RPC blocks GPA, confirm soft warn (`meSolanaNoIndex`) + cache/recent-id fallback — not a hard dead-end.  
+- Product boundary per [`asset-policy.md`](asset-policy.md).
 
 ---
 

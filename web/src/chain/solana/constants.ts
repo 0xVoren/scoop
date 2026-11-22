@@ -33,6 +33,16 @@ export const IX = {
   recover_prize: Uint8Array.from([202, 95, 255, 238, 130, 236, 34, 215]),
 } as const
 
+/** Anchor `account:BuyerRecord` discriminator (sha256[0..8]). */
+export const BUYER_RECORD_DISCRIMINATOR = Uint8Array.from([107, 122, 54, 31, 4, 54, 209, 38])
+
+/**
+ * Layout: 8 disc + 8 raffle_id + 32 buyer + 8 paid + 4 share_count + 1 refunded + 1 bump.
+ * buyer pubkey starts at offset 16.
+ */
+export const BUYER_RECORD_DATA_SIZE = 62
+export const BUYER_RECORD_BUYER_OFFSET = 16
+
 export enum RaffleStatus {
   Selling = 0,
   SoldOut = 1,

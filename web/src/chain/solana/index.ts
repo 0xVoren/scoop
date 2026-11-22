@@ -1,5 +1,10 @@
+export { readBoughtRaffleIds, rememberBoughtRaffleId } from '@/chain/solana/buyer-cache'
+export { buyerRecordFiltersForBuyer } from '@/chain/solana/buyer-filters'
 export { getSolanaConnection, resolveSolanaEndpoint } from '@/chain/solana/connection'
 export {
+  BUYER_RECORD_BUYER_OFFSET,
+  BUYER_RECORD_DATA_SIZE,
+  BUYER_RECORD_DISCRIMINATOR,
   DEFAULT_PROGRAM_ID,
   IX,
   isNativeMint,
@@ -49,7 +54,10 @@ export {
   fetchSolanaShareBoard,
   fetchSolanaShareCount,
   fetchSolanaShareOwner,
+  listSolanaBuyerRecordsByBuyer,
+  listSolanaPurchasesForBuyer,
   listSolanaRafflesRough,
+  type SolanaBuyerPurchase,
 } from '@/chain/solana/reads'
 export { useSolanaWrites } from '@/chain/solana/useSolanaWrites'
 export { SolanaWalletProvider } from '@/chain/solana/wallet-provider'
