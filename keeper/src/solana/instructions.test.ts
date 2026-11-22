@@ -5,6 +5,8 @@ import {
   buildBuySharesIx,
   buildClaimPrizeIx,
   buildClaimProceedsIx,
+  buildCloseBuyerRecordIx,
+  buildCloseShareBoardIx,
   buildCreateRaffleIx,
   buildDrawIx,
   buildDrawManyIx,
@@ -138,5 +140,41 @@ describe('solana instructions', () => {
       raffleId: 1n,
     })
     expect(recover.data.equals(IX.recover_prize)).toBe(true)
+  })
+
+  it('builds close_share_board / close_buyer_record with authority + config', () => {
+    const authority = PublicKey.unique()
+    const recipient = PublicKey.unique()
+    const buyer = PublicKey.unique()
+    const record = PublicKey.unique()
+    const [config] = configPda(PROGRAM_ID)
+
+    const closeBoard = buildCloseShareBoardIx({
+      programId: PROGRAM_ID,
+      authority,
+      recipient,
+      raffleId: 7n,
+    })
+    expect(closeBoard.data.equals(IX.close_share_board)).toBe(true)
+    expect(closeBoard.keys[0]!.pubkey.equals(authority)).toBe(true)
+    expect(closeBoard.keys[0]!.isSigner).toBe(true)
+    expect(closeBoard.keys[1]!.pubkey.equals(config)).toBe(true)
+    expect(closeBoard.keys[2]!.pubkey.equals(recipient)).toBe(true)
+    expect(closeBoard.keys[2]!.isWritable).toBe(true)
+    expect(closeBoard.keys[2]!.isSigner).toBe(false)
+
+    const closeBuyer = buildCloseBuyerRecordIx({
+      programId: PROGRAM_ID,
+      authority,
+      recipient,
+      raffleId: 7n,
+      buyer,
+      buyerRecord: record,
+    })
+    expect(closeBuyer.data.equals(IX.close_buyer_record)).toBe(true)
+    expect(closeBuyer.keys[0]!.isSigner).toBe(true)
+    expect(closeBuyer.keys[1]!.pubkey.equals(config)).toBe(true)
+    expect(closeBuyer.keys[4]!.pubkey.equals(buyer)).toBe(true)
+    expect(closeBuyer.keys[5]!.pubkey.equals(record)).toBe(true)
   })
 })

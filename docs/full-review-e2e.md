@@ -32,7 +32,7 @@
 |---|---|
 | L1 | Dead errors: `AlreadyDrawn` / `NoBlockhash` (EVM); Solana `AlreadyDrawn` unwired |
 | L2 | EVM `LibAsset.push` BNB uses string require; outbound has no balance-delta (FoT already rejected on pull — acceptable) |
-| L3 | Solana `close_buyer_record` any recipient can take rent (comments admit ops); keeper IX map lacks `close_*` |
+| L3 | ~~Solana `close_buyer_record` any recipient can take rent~~ **fixed:** Config.authority-only + authority-chosen recipient; keeper IX map still lacks ops `close_*` helpers (optional) |
 | L4 | `draw_many` ignores `pending.remove` failure; remaining accounts lack defensive PDA seeds checks |
 | L5 | Frontend: `family === 'solana' \| 'evm'` dual-track components; wrong-chain pill / misconfigured Diamond vs Program ID UX failures (not contract bugs) |
 

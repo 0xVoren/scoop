@@ -56,7 +56,7 @@ anchor build
 | `create_raffle` | 托管奖品 → `Selling`（0 费） |
 | `buy_shares` | 购份额；售罄 → `SoldOut` + pending 入队 |
 | `draw` / `draw_many` | 任何人；锚定 `eligible` SlotHash；`draw_many` 跳过未就绪/熵过期 |
-| `close_share_board` / `close_buyer_record` | 终端态回收租金（对标 dRaffle close_entrants） |
+| `close_share_board` / `close_buyer_record` | 终端态回收租金；**仅 Config.authority**；租金到 authority 指定 recipient（买家/路人不可关） |
 | `claim_prize` | 赢家 100% 奖品（0 费） |
 | `claim_proceeds` | 创作者收益；`fee = raised/100` → fee_recipient |
 | `refund` / `recover_prize` | Selling 截止过期，或 SoldOut 熵过期 → `Expired`（0 费）；需 `pending` 账户 |

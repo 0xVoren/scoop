@@ -100,12 +100,12 @@ pub mod scoop {
         instructions::recover_prize::handler(ctx)
     }
 
-    /// Close ShareBoard after terminal status; reclaim rent (cf. dRaffle close_entrants)
+    /// Close ShareBoard after Drawn/Expired; Config.authority only; rent → recipient
     pub fn close_share_board(ctx: Context<CloseShareBoard>) -> Result<()> {
         instructions::close_accounts::close_share_board(ctx)
     }
 
-    /// Close BuyerRecord after refund or Drawn
+    /// Close BuyerRecord after refunded|Drawn; Config.authority only; rent → recipient
     pub fn close_buyer_record(ctx: Context<CloseBuyerRecord>) -> Result<()> {
         instructions::close_accounts::close_buyer_record(ctx)
     }
@@ -381,5 +381,27 @@ mod invariant_tests {
         let mut blank = sample_raffle(RaffleStatus::Selling);
         blank.creator = Pubkey::default();
         assert!(ensure_expired(&mut blank, 9_999, 9_999, None).is_err());
+    }
+
+    // --- close_* status gates (authority check is Accounts has_one; tested in e2e) ---
+    #[test]
+    fn close_status_gates() {
+        use crate::instructions::close_accounts::{
+            buyer_record_close_allowed, share_board_close_allowed,
+        };
+
+        assert!(!share_board_close_allowed(RaffleStatus::Selling));
+        assert!(!share_board_close_allowed(RaffleStatus::SoldOut));
+        assert!(share_board_close_allowed(RaffleStatus::Drawn));
+        assert!(share_board_close_allowed(RaffleStatus::Expired));
+
+        // BuyerRecord: refunded wins even while Selling/Expired after refund path
+        assert!(!buyer_record_close_allowed(RaffleStatus::Selling, false));
+        assert!(!buyer_record_close_allowed(RaffleStatus::SoldOut, false));
+        assert!(buyer_record_close_allowed(RaffleStatus::Drawn, false));
+        assert!(buyer_record_close_allowed(RaffleStatus::Drawn, true));
+        assert!(buyer_record_close_allowed(RaffleStatus::Expired, true));
+        assert!(!buyer_record_close_allowed(RaffleStatus::Expired, false));
+        assert!(buyer_record_close_allowed(RaffleStatus::Selling, true));
     }
 }

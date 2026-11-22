@@ -68,7 +68,7 @@ Solana MVP lists recent raffles on Live by scanning ids (not a full site index).
 
 EVM keeps event-based purchase indexing (`SharesPurchased`) and creator/token order maps in Diamond storage.
 
-**Residual limits (Solana Me):** some public RPCs disable `getProgramAccounts` (UI falls back + warns); `close_buyer_record` removes the PDA so closed records disappear from history.
+**Residual limits (Solana Me):** some public RPCs disable `getProgramAccounts` (UI falls back + warns). `close_buyer_record` is **Config.authority-only** (buyers cannot self-close); when authority does reclaim rent, the PDA disappears from history — delay reclaim until an indexer exists or after long retention (see `PROTOCOL.md` Solana account reclaim).
 
 ---
 

@@ -43,8 +43,14 @@ Pull paths record expected amount and require vault balance increase to match ex
 
 ## Solana account reclaim
 
-- After `Drawn` or `Expired`: `close_share_board` returns rent to recipient (dRaffle `close_entrants` analogue).
-- After buyer `refunded` or raffle `Drawn`: `close_buyer_record`.
+**Permission:** only `Config.authority` may call `close_share_board` / `close_buyer_record`. Rent goes to an **authority-chosen** `recipient` (typically `fee_recipient` or authority). Buyers and strangers **cannot** close — Me listing (`BuyerRecord` GPA) must not be wiped by a buyer self-close.
+
+| Instruction | Status gate | Who | Rent to |
+|---|---|---|---|
+| `close_share_board` | `Drawn` or `Expired` | Config.authority | authority-chosen recipient |
+| `close_buyer_record` | buyer `refunded` **or** raffle `Drawn` | Config.authority | authority-chosen recipient |
+
+**Retention (Me / SCO-34):** prefer **not** reclaiming `BuyerRecord` rent while the product relies on on-chain GPA for purchase history. Ops should delay close until an indexer exists, or after an explicit long retention once refunded/claimed paths are settled. Correct permissions beat early rent reclaim.
 
 ## Future reservation: locker dividends (not implemented)
 

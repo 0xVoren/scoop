@@ -56,7 +56,7 @@ anchor build
 | `create_raffle` | Escrow prize → `Selling` (0 fee) |
 | `buy_shares` | Buy shares; sell-out → `SoldOut` + enqueue pending |
 | `draw` / `draw_many` | Anyone; anchor `eligible` SlotHash; `draw_many` skips not-ready / entropy-expired |
-| `close_share_board` / `close_buyer_record` | Terminal-state rent reclaim (dRaffle-style close_entrants) |
+| `close_share_board` / `close_buyer_record` | Terminal-state rent reclaim; **Config.authority only**; rent → authority-chosen recipient (not buyer/stranger) |
 | `claim_prize` | Winner gets 100% prize (0 fee) |
 | `claim_proceeds` | Creator proceeds; `fee = raised/100` → fee_recipient |
 | `refund` / `recover_prize` | Selling past deadline, or SoldOut entropy expired → `Expired` (0 fee); needs `pending` account |

@@ -32,7 +32,7 @@
 |---|---|
 | L1 | 死 error：`AlreadyDrawn` / `NoBlockhash`（EVM）、Solana `AlreadyDrawn` 未接线 |
 | L2 | EVM `LibAsset.push` BNB 用 string require；outbound 无余额差（FoT 已在 pull 拒绝，可接受） |
-| L3 | Solana `close_buyer_record` 任意 recipient 可收租金（注释承认 ops）；keeper IX map 未含 `close_*` |
+| L3 | ~~Solana `close_buyer_record` 任意 recipient 可收租金~~ **已修：** 仅 Config.authority + authority 指定 recipient；keeper IX map 仍缺 ops 用 `close_*` 辅助（可选） |
 | L4 | `draw_many` 忽略 `pending.remove` 失败；remaining accounts 缺 PDA seeds 防御性校验 |
 | L5 | 前端：`family === 'solana' \| 'evm'` 双轨组件；错链 pill / env 配错 Diamond vs Program ID 时 UX 失败（非合约漏洞） |
 

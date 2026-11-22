@@ -26,6 +26,8 @@ export const IX = {
   recover_prize: Buffer.from([202, 95, 255, 238, 130, 236, 34, 215]),
   set_protocol_config: Buffer.from([203, 186, 218, 225, 142, 27, 24, 108]),
   set_fee_recipient: Buffer.from([227, 18, 215, 42, 237, 246, 151, 66]),
+  close_share_board: Buffer.from([92, 20, 93, 186, 6, 116, 144, 159]),
+  close_buyer_record: Buffer.from([27, 105, 238, 144, 158, 212, 40, 114]),
 } as const
 
 /** Classic SPL Token Program (MVP; Token-2022 rejected on-chain). */

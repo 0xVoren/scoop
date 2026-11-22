@@ -69,7 +69,7 @@ On-chain Solana MVP does **not** emit EVM-style `SharesPurchased` logs or mainta
 
 EVM keeps event-based purchase indexing (`SharesPurchased`) and creator/token order maps in Diamond storage.
 
-**残留限制：** 部分公共 RPC 禁用 `getProgramAccounts`（UI 回退并警告）；`close_buyer_record` 关闭后记录从历史消失。
+**残留限制：** 部分公共 RPC 禁用 `getProgramAccounts`（UI 回退并警告）。`close_buyer_record` **仅 Config.authority** 可调（买家不能自关）；authority 回收租金后 PDA 从历史消失——有索引器或长期保留后再关（见 `PROTOCOL.md` Solana account reclaim）。
 
 ---
 

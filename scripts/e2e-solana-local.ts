@@ -51,6 +51,8 @@ import {
   buildBuySharesIx,
   buildClaimPrizeIx,
   buildClaimProceedsIx,
+  buildCloseBuyerRecordIx,
+  buildCloseShareBoardIx,
   buildCreateRaffleIx,
   buildDrawIx,
   buildInitializeIx,
@@ -597,6 +599,96 @@ async function main() {
     }),
   )
   console.log('OK lifecycle')
+
+  // ========== 1b) close_* authority gate (buyer/stranger denied; authority ok) ==========
+  console.log(`-- 1b) close permission (raffle_id=${raffleId}) --`)
+  const stranger = Keypair.generate()
+  await airdrop(connection, stranger.publicKey, 1)
+
+  let buyerCloseDenied = false
+  try {
+    await send(
+      connection,
+      buyer,
+      buildCloseBuyerRecordIx({
+        programId: PROGRAM_ID,
+        authority: buyer.publicKey,
+        recipient: buyer.publicKey,
+        raffleId,
+        buyer: buyer.publicKey,
+        buyerRecord: buyerRec,
+      }),
+    )
+  } catch {
+    buyerCloseDenied = true
+  }
+  if (!buyerCloseDenied) throw new Error('buyer must not close_buyer_record')
+
+  let strangerCloseDenied = false
+  try {
+    await send(
+      connection,
+      stranger,
+      buildCloseBuyerRecordIx({
+        programId: PROGRAM_ID,
+        authority: stranger.publicKey,
+        recipient: stranger.publicKey,
+        raffleId,
+        buyer: buyer.publicKey,
+        buyerRecord: buyerRec,
+      }),
+    )
+  } catch {
+    strangerCloseDenied = true
+  }
+  if (!strangerCloseDenied) throw new Error('stranger must not close_buyer_record')
+
+  let strangerBoardDenied = false
+  try {
+    await send(
+      connection,
+      stranger,
+      buildCloseShareBoardIx({
+        programId: PROGRAM_ID,
+        authority: stranger.publicKey,
+        recipient: stranger.publicKey,
+        raffleId,
+      }),
+    )
+  } catch {
+    strangerBoardDenied = true
+  }
+  if (!strangerBoardDenied) throw new Error('stranger must not close_share_board')
+
+  await send(
+    connection,
+    authority,
+    buildCloseBuyerRecordIx({
+      programId: PROGRAM_ID,
+      authority: authority.publicKey,
+      recipient: config.feeRecipient,
+      raffleId,
+      buyer: buyer.publicKey,
+      buyerRecord: buyerRec,
+    }),
+  )
+  if (await connection.getAccountInfo(buyerRec)) {
+    throw new Error('buyer_record should be closed by authority')
+  }
+  await send(
+    connection,
+    authority,
+    buildCloseShareBoardIx({
+      programId: PROGRAM_ID,
+      authority: authority.publicKey,
+      recipient: config.feeRecipient,
+      raffleId,
+    }),
+  )
+  if (await connection.getAccountInfo(boardPk)) {
+    throw new Error('share_board should be closed by authority')
+  }
+  console.log('OK close permission (buyer/stranger denied; authority reclaim)')
 
   // ========== 2) keeper draw_many ==========
   const rid2 = await nextRaffleId(connection)

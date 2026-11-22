@@ -387,3 +387,51 @@ export function buildRecoverPrizeIx(args: {
     data: Buffer.from(IX.recover_prize),
   })
 }
+
+/** Close ShareBoard after Drawn/Expired — Config.authority only; rent → recipient. */
+export function buildCloseShareBoardIx(args: {
+  programId: PublicKey
+  authority: PublicKey
+  recipient: PublicKey
+  raffleId: bigint
+}): TransactionInstruction {
+  const [config] = configPda(args.programId)
+  const [raffle] = rafflePda(args.programId, args.raffleId)
+  const [shareBoard] = shareBoardPda(args.programId, args.raffleId)
+  return new TransactionInstruction({
+    programId: args.programId,
+    keys: [
+      meta(args.authority, { isSigner: true }),
+      meta(config),
+      meta(args.recipient, { isWritable: true }),
+      meta(raffle),
+      meta(shareBoard, { isWritable: true }),
+    ],
+    data: Buffer.from(IX.close_share_board),
+  })
+}
+
+/** Close BuyerRecord after refunded|Drawn — Config.authority only; rent → recipient. */
+export function buildCloseBuyerRecordIx(args: {
+  programId: PublicKey
+  authority: PublicKey
+  recipient: PublicKey
+  raffleId: bigint
+  buyer: PublicKey
+  buyerRecord: PublicKey
+}): TransactionInstruction {
+  const [config] = configPda(args.programId)
+  const [raffle] = rafflePda(args.programId, args.raffleId)
+  return new TransactionInstruction({
+    programId: args.programId,
+    keys: [
+      meta(args.authority, { isSigner: true }),
+      meta(config),
+      meta(args.recipient, { isWritable: true }),
+      meta(raffle),
+      meta(args.buyer),
+      meta(args.buyerRecord, { isWritable: true }),
+    ],
+    data: Buffer.from(IX.close_buyer_record),
+  })
+}

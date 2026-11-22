@@ -74,7 +74,7 @@ Log in a private ops note (not this repo unless asked):
 2. Multi-buyer `buy_shares` → SoldOut; pending enqueue.  
 3. Wait `draw_delay_slots`; `draw` with SlotHashes.  
 4. `claim_prize` / `claim_proceeds` (1% to fee_recipient).  
-5. Optional: `close_share_board` / `close_buyer_record` rent reclaim after Drawn.
+5. Optional: `close_share_board` / `close_buyer_record` rent reclaim after Drawn (**Config.authority only**; delay BuyerRecord reclaim while Me uses GPA).
 
 ### 4.4 Solana expire path
 

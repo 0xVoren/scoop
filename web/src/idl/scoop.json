@@ -141,7 +141,9 @@
       "name": "close_share_board",
       "discriminator": [92, 20, 93, 186, 6, 116, 144, 159],
       "accounts": [
-        { "name": "recipient", "writable": true, "signer": true },
+        { "name": "authority", "signer": true },
+        { "name": "config" },
+        { "name": "recipient", "writable": true },
         { "name": "raffle" },
         { "name": "share_board", "writable": true }
       ],
@@ -151,7 +153,9 @@
       "name": "close_buyer_record",
       "discriminator": [27, 105, 238, 144, 158, 212, 40, 114],
       "accounts": [
-        { "name": "recipient", "writable": true, "signer": true },
+        { "name": "authority", "signer": true },
+        { "name": "config" },
+        { "name": "recipient", "writable": true },
         { "name": "raffle" },
         { "name": "buyer" },
         { "name": "buyer_record", "writable": true }
