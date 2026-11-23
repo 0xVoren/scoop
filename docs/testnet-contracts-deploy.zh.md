@@ -2,9 +2,14 @@
 
 [English](testnet-contracts-deploy.md)
 
-**日期：** 2026-11-21  
-**范围：** 仅合约（BSC testnet Diamond + Solana devnet program）；不含前端 Pages / keeper 实机 / 主网。  
-**机密：** 私钥 / 助记词只留在本机 env、Foundry keystore、Solana CLI 或 1Password；**禁止**写入本文件或 Agent Store。
+公开 UI 所使用的 BSC 测试网 Diamond 与 Solana devnet 程序部署权威记录。不含前端 Pages 切换、keeper 实机运维与主网。
+
+**机密：** 私钥与助记词只留在本机 env、Foundry keystore、Solana CLI 或 1Password — **禁止**写入本文件或 Agent Store。
+
+| | |
+|---|---|
+| 线上 UI | https://0xvoren.github.io/scoop/ |
+| 仓库 | https://github.com/0xVoren/scoop |
 
 ---
 

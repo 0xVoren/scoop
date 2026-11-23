@@ -2,7 +2,8 @@
 
 [中文](asset-policy.zh.md)
 
-**Status:** product + on-chain policy for mainnet readiness  
+Product and on-chain rules for which assets Scoop accepts as prize or payment. Applies to both chains; UI copy must match these gates before mainnet readiness.
+
 **Rule source:** [`PROTOCOL.md`](PROTOCOL.md) §Supported assets · [`invariants-evm-solana.md`](invariants-evm-solana.md) §2 · [`hardening-from-research.md`](hardening-from-research.md)  
 **UI copy keys:** `web/src/lib/i18n.tsx` (see §4)
 

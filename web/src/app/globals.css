@@ -362,11 +362,18 @@ kbd {
   background: var(--link-soft);
   color: var(--ink);
   font-size: 14px;
+  line-height: 1.5;
 }
 
 .flash.warn {
   border-color: color-mix(in srgb, var(--warn) 40%, transparent);
   background: var(--warn-soft);
+}
+
+.flash.error {
+  border-color: color-mix(in srgb, var(--err) 40%, transparent);
+  background: var(--err-soft);
+  color: var(--err);
 }
 
 .input {
@@ -833,7 +840,7 @@ kbd {
 .page {
   max-width: var(--page);
   margin: 0 auto;
-  padding: 24px var(--gut) calc(48px + env(safe-area-inset-bottom, 0px));
+  padding: 28px var(--gut) calc(48px + env(safe-area-inset-bottom, 0px));
 }
 
 .page-h {
@@ -842,8 +849,8 @@ kbd {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  padding-bottom: 16px;
-  margin-bottom: 16px;
+  padding-bottom: 18px;
+  margin-bottom: 20px;
   border-bottom: 1px solid var(--rule);
 }
 
@@ -857,10 +864,11 @@ kbd {
 }
 
 .page-h p {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   color: var(--ink-2);
   font-size: 14px;
-  max-width: 70ch;
+  line-height: 1.55;
+  max-width: 62ch;
 }
 
 /* ——— Hero (home first viewport) ——— */
@@ -1137,7 +1145,7 @@ kbd {
 }
 
 .me-sect {
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 
 .me-sect-h {
@@ -1146,17 +1154,29 @@ kbd {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-2);
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-family: var(--display);
 }
 
 .empty {
-  padding: 28px 16px;
+  padding: 36px 20px;
   text-align: center;
   color: var(--ink-2);
   border: 1px dashed var(--rule-2);
   border-radius: var(--r);
-  background: color-mix(in srgb, var(--bg-3) 70%, transparent);
+  background: color-mix(in srgb, var(--bg-3) 55%, transparent);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.empty a {
+  font-weight: 500;
+}
+
+.empty .muted.small {
+  display: block;
+  max-width: 42ch;
+  margin-inline: auto;
 }
 
 .create-form,
@@ -1244,7 +1264,8 @@ a.addr-value:hover {
 
 .addr-copy {
   flex: none;
-  min-height: 32px;
+  min-height: 36px;
+  min-width: 44px;
   padding: 0 12px;
   border-radius: 6px;
   border: 1px solid var(--btn-border);
@@ -1304,9 +1325,10 @@ a.addr-value:hover {
 .foot-links a {
   color: var(--ink-2);
   text-decoration: none;
-  min-height: 36px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
+  padding: 0 2px;
 }
 
 .foot-links a:hover {
@@ -1362,4 +1384,37 @@ a.addr-value:hover {
 
 [data-rk] button {
   font: inherit;
+}
+
+/* Sonner toasts — match formal ink/teal surface */
+.scoop-toast,
+[data-sonner-toaster] [data-sonner-toast].scoop-toast {
+  font-family: var(--sans) !important;
+  font-size: 14px !important;
+  border-radius: var(--r) !important;
+  border: 1px solid var(--rule-2) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+@media (max-width: 720px) {
+  .tab {
+    min-height: 48px;
+    padding: 0 14px;
+  }
+
+  .addr-copy {
+    min-height: 40px;
+  }
+
+  .empty {
+    padding: 28px 16px;
+  }
+
+  .page-h p {
+    max-width: none;
+  }
+
+  .section-h {
+    margin-top: 20px;
+  }
 }

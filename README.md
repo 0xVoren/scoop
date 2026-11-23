@@ -2,21 +2,30 @@
 
 [中文](README.zh.md)
 
-On-chain share raffle (一元夺宝-style). **One product rulebook, two chain implementations:** production path is BNB Smart Chain (EVM Diamond); Solana (Anchor) tracks the same product invariants — see [`docs/solana-dual-chain-plan.md`](docs/solana-dual-chain-plan.md) and the comparison table [`docs/invariants-evm-solana.md`](docs/invariants-evm-solana.md).
+**On-chain share raffle protocol** — one product rulebook, two chain implementations.
 
-Anyone escrows a prize (native or fungible token), sells a fixed number of shares priced in a payment asset (may differ), then after sell-out + `N` slots/blocks anyone can `draw` via an on-chain hash window (no external VRF). Winner takes **100% of the prize**; creator takes proceeds minus **1%** sent to `feeRecipient` on `claimProceeds`.
+Anyone escrows a prize (native or fungible token), sells a fixed number of shares priced in a payment asset (which may differ), then after sell-out plus a configured delay anyone may `draw` using an on-chain hash window (no external VRF). The winning share claims **100% of the prize**; the creator claims proceeds minus a **1%** protocol fee to `feeRecipient` on `claimProceeds`.
 
-## Layout
+| | |
+|---|---|
+| Live UI (GitHub Pages) | https://0xvoren.github.io/scoop/ |
+| Source | https://github.com/0xVoren/scoop |
+| BSC testnet Diamond | [`0xfB2678ff49967B073F6537781EC3d35DE731a5DF`](https://testnet.bscscan.com/address/0xfB2678ff49967B073F6537781EC3d35DE731a5DF) |
+| Solana program (devnet) | [`FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT`](https://explorer.solana.com/address/FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT?cluster=devnet) |
+
+Production path: **BNB Smart Chain** (EVM EIP-2535 Diamond). **Solana** (Anchor) tracks the same product invariants — see [`docs/solana-dual-chain-plan.md`](docs/solana-dual-chain-plan.md) and [`docs/invariants-evm-solana.md`](docs/invariants-evm-solana.md). The public Pages deployment targets **testnets only** (BSC Chapel + Solana devnet); it does not invent or advertise mainnet addresses.
+
+## Repository layout
 
 ```text
 contracts/   # Foundry + EIP-2535 Diamond (BSC / EVM)
-programs/    # Anchor MVP (Solana) — Program ID FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT
-docs/        # design + dual-chain plan + invariants
-web/         # Next.js App Router + wagmi (+ Solana adapter skeleton)
-keeper/      # pending-draw trigger (EVM + Solana)
+programs/    # Anchor program (Solana) — Program ID FC9im2jk…UrpHT
+docs/        # Protocol notes, dual-chain plan, deploy & ops runbooks
+web/         # Next.js App Router + wagmi + Solana wallet-adapter (static export)
+keeper/      # Permissionless pending-draw trigger (EVM + Solana)
 ```
 
-## Contracts
+## Contracts (EVM)
 
 ```bash
 cd contracts
@@ -44,9 +53,9 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-Static export can host on **GitHub Pages** (`pnpm build` → `web/out`; workflow: `.github/workflows/pages.yml`).  
+Static export hosts on **GitHub Pages** (`pnpm build` → `web/out`; workflow: `.github/workflows/pages.yml`).  
 Routes: `/` · `/create` · `/me` · `/raffle/?id=` · `/token/?a=` · `/user/?a=`  
-Wallet: RainbowKit (optional peers `@x402/core` / `@x402/evm` / `@x402/svm` are listed in dependencies).
+Package notes: [`web/README.md`](web/README.md). Pages defaults: [`docs/github-pages-testnet.md`](docs/github-pages-testnet.md).
 
 ## Keeper (pendingDraw monitor)
 
@@ -58,7 +67,9 @@ DIAMOND_ADDRESS=0x... CHAIN=local pnpm tick
 KEEPER_CHAIN=solana SOLANA_KEEPER_KEYPAIR=~/.config/solana/id.json pnpm tick
 ```
 
-Local end-to-end:
+Details: [`keeper/README.md`](keeper/README.md).
+
+## Local and testnet verification
 
 ```bash
 # EVM (needs Anvil + deployed Diamond)
@@ -69,28 +80,33 @@ bash scripts/e2e-solana-local.sh
 
 Solana local gates and asset matrix: see the header of `scripts/e2e-solana-local.ts`. Library unit tests: `cd programs && CARGO_TARGET_DIR=/tmp/scoop-programs-target cargo test -p scoop --lib`.
 
-Solana **devnet / testnet** (self-funded keypair; never commit private keys):
+Solana **devnet** (self-funded keypair; never commit private keys):
 
 ```bash
 export SOLANA_AUTHORITY_KEYPAIR=~/.config/solana/id.json
 bash scripts/deploy-solana-devnet.sh          # .so + initialize
 bash scripts/e2e-solana-devnet.sh             # create→buy→delay→draw
-# Keeper
 KEEPER_CHAIN=solana SOLANA_RPC_URL=https://api.devnet.solana.com \
   SOLANA_KEEPER_KEYPAIR=~/.config/solana/id.json pnpm --dir keeper tick
 ```
 
-Testnet contract deploy notes (BSC + Solana): [`docs/testnet-contracts-deploy.md`](docs/testnet-contracts-deploy.md).  
-Keeper testnet ops: [`docs/keeper-testnet-ops.md`](docs/keeper-testnet-ops.md).  
-Solana-focused: [`docs/solana-testnet-deploy.md`](docs/solana-testnet-deploy.md); also [`keeper/README.md`](keeper/README.md), [`programs/README.md`](programs/README.md).
+| Document | Purpose |
+|---|---|
+| [`docs/testnet-contracts-deploy.md`](docs/testnet-contracts-deploy.md) | BSC + Solana testnet deploy record |
+| [`docs/keeper-testnet-ops.md`](docs/keeper-testnet-ops.md) | Keeper testnet operations |
+| [`docs/solana-testnet-deploy.md`](docs/solana-testnet-deploy.md) | Solana-focused deploy |
+| [`docs/frontend-testnet.md`](docs/frontend-testnet.md) | Point local UI at testnets |
+| [`docs/github-pages-testnet.md`](docs/github-pages-testnet.md) | Pages workflow + baked defaults |
+| [`programs/README.md`](programs/README.md) | Anchor program toolchain |
 
-## Spec
+## Spec and ops
 
-- Protocol notes (fees + future fee-sink reservation): [`docs/PROTOCOL.md`](docs/PROTOCOL.md)
-- Design: [`docs/superpowers/specs/2026-11-13-scoop-design.md`](docs/superpowers/specs/2026-11-13-scoop-design.md)
+- Protocol notes (fees, draw entropy, assets, reclaim): [`docs/PROTOCOL.md`](docs/PROTOCOL.md)
+- Asset policy: [`docs/asset-policy.md`](docs/asset-policy.md)
+- Design history: [`docs/superpowers/specs/2026-11-13-scoop-design.md`](docs/superpowers/specs/2026-11-13-scoop-design.md)
 - Dual-chain plan: [`docs/solana-dual-chain-plan.md`](docs/solana-dual-chain-plan.md)
 - EVM ↔ Solana invariants: [`docs/invariants-evm-solana.md`](docs/invariants-evm-solana.md)
-- Solana testnet deploy: [`docs/solana-testnet-deploy.md`](docs/solana-testnet-deploy.md)
+- Mainnet preparation (do not deploy until explicitly ordered): [`docs/mainnet-runbook.md`](docs/mainnet-runbook.md)
 
 ## License
 

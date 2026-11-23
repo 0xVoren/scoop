@@ -2,12 +2,12 @@
 
 [中文](README.zh.md)
 
-Permissionless **pendingDraw** monitor: calls `drawMany` / `draw_many` when eligible.
+Permissionless **pendingDraw** monitor: calls `drawMany` / `draw_many` when raffles become eligible.
 
-Aligned with a grid9-style keeper: cron fallback + HTTP `POST /trigger`. Drawing itself is permissionless; the keeper only automates it.  
+Drawing itself is permissionless; the keeper only automates it (cron fallback + HTTP `POST /trigger`).  
 When the frontend sets `NEXT_PUBLIC_KEEPER_URL`, the raffle detail page fire-and-forgets POST `/trigger` on draw-ready (users can still draw manually).
 
-Supports **EVM** and **Solana** execution paths (`KEEPER_CHAIN`).
+Supports **EVM** and **Solana** via `KEEPER_CHAIN`. Ops: [`docs/keeper-testnet-ops.md`](../docs/keeper-testnet-ops.md).
 
 ## Environment
 

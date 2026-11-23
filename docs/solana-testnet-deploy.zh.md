@@ -2,10 +2,14 @@
 
 [English](solana-testnet-deploy.md)
 
-**日期：** 2026-11-20  
-**集群：** Solana **devnet**（产品称「测试网」时默认指此；非 testnet-beta）  
-**随机：** SlotHashes（**禁止 VRF**）  
-**Program ID（keypair）：** `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT`
+在 Solana **devnet** 上部署并验证 Scoop Anchor 程序（文档称「测试网」时默认指此；非 testnet-beta）。
+
+| | |
+|---|---|
+| Program ID | `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT` |
+| 随机源 | SlotHashes（**无 VRF**） |
+| Explorer | https://explorer.solana.com/address/FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT?cluster=devnet |
+| 线上 UI | https://0xvoren.github.io/scoop/ |
 
 > 机密（私钥 / 助记词 / JSON 密钥）只放在本机 `~/.config/solana/` 或 CI secret；**禁止**写入 Agent Store / git。
 

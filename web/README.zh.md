@@ -2,9 +2,18 @@
 
 [English](README.md)
 
-Next.js App Router + wagmi / RainbowKit（EVM）+ Solana wallet-adapter 前端。  
+Scoop 的 Next.js App Router 前端：wagmi / RainbowKit（EVM）与 Solana wallet-adapter。  
 对接 Scoop Diamond（BSC / Anvil）与 Scoop Anchor program（Solana）。  
-**静态导出**（`output: 'export'`），可托管到 **GitHub Pages**。
+**静态导出**（`output: 'export'`），用于 **GitHub Pages**。
+
+| | |
+|---|---|
+| 线上 | https://0xvoren.github.io/scoop/ |
+| 仓库 | https://github.com/0xVoren/scoop |
+| Pages 手册 | [`docs/github-pages-testnet.zh.md`](../docs/github-pages-testnet.zh.md) |
+| 本地测试网环境 | [`docs/frontend-testnet.zh.md`](../docs/frontend-testnet.zh.md) |
+| BSC 测试网 Diamond | `0xfB2678ff49967B073F6537781EC3d35DE731a5DF` |
+| Solana 程序 | `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT` |
 
 ## Setup
 
@@ -47,10 +56,9 @@ NEXT_PUBLIC_SOLANA_RPC=http://127.0.0.1:8899
 ```
 
 3. `pnpm dev` → header 切到 **Solana** → Phantom/Solflare（localnet）连接。
-4. **页面已按 ActiveChain 分支**：`/create`、`/raffle/?id=` 的买/开奖/领奖/退款/收回，以及首页粗列表，在 `family=solana` 时走 `useSolanaWrites` / `fetchSolanaRaffleById`；EVM 仍走 wagmi。  
-   开奖随机源为 **SlotHashes**（与对照表一致；无 VRF）。
-5. 读：`fetchSolanaRaffleById`；列表 `listSolanaRafflesRough`（顺序扫近期 id，**不是**完整索引）。  
-   `/me`、`/user`、`/token` 在 Solana 下显示诚实空态（无事件/次级索引）。
+4. **按 ActiveChain 分支**：`/create`、`/raffle/?id=`（买 / 开奖 / 领奖 / 退款 / 收回）与首页列表在 `family=solana` 时走 Solana 适配；EVM 走 wagmi。开奖熵源为 **SlotHashes**（无 VRF）。
+5. 读：`fetchSolanaRaffleById`；首页列表为顺序扫描近期 id（**不是**全站索引）。  
+   `/me` 通过 **BuyerRecord GPA** 列出 Solana 购买记录。`/user`、`/token` 在 Solana 无次级索引，展示明确空态 / 限制说明。
 
 原生 SOL 哨兵 = `Pubkey::default()`（`1111…1111`）；显式 wSOL mint 走普通 SPL，不 auto-wrap。  
 钱包：Solana → `WalletPill`（wallet-adapter）；EVM → RainbowKit。

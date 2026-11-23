@@ -1,13 +1,18 @@
-# Scoop Solana Programs（Anchor MVP）
+# Scoop Solana Programs（Anchor）
 
 [English](README.md)
 
-与 EVM Diamond 同产品语义。规则源：[`docs/invariants-evm-solana.md`](../docs/invariants-evm-solana.md)。
+Scoop 的 Solana 实现，与 EVM Diamond 保持同一产品语义。  
+规则源：[`docs/invariants-evm-solana.md`](../docs/invariants-evm-solana.md)。
 
-**Program ID（localnet / 预定 devnet keypair）：** `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT`
+| | |
+|---|---|
+| Program ID | `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT` |
+| 公开集群 | Solana **devnet** |
+| Explorer | https://explorer.solana.com/address/FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT?cluster=devnet |
+| 部署说明 | [`docs/solana-testnet-deploy.zh.md`](../docs/solana-testnet-deploy.zh.md) · [`docs/testnet-contracts-deploy.zh.md`](../docs/testnet-contracts-deploy.zh.md) |
 
-**测试网部署：** 见 [`docs/solana-testnet-deploy.md`](../docs/solana-testnet-deploy.md) · 总表 [`docs/testnet-contracts-deploy.md`](../docs/testnet-contracts-deploy.md)。  
-**devnet 已上链**（Program ID 同上；initialize + create→buy→draw 冒烟已通过）。本地验证：`bash scripts/e2e-solana-local.sh`。
+devnet 已托管该 Program ID（initialize + create→buy→draw 冒烟已通过）。本地验证：`bash scripts/e2e-solana-local.sh`。
 
 ```bash
 # Devnet：部署 .so + initialize（密钥路径用环境变量，勿写入仓库）

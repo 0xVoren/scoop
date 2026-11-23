@@ -1,8 +1,17 @@
 # Scoop Protocol Notes
 
-Operational invariants and extension points. Detailed design history lives under `docs/superpowers/`.  
+Canonical product and on-chain invariants for Scoop (fees, draw entropy, assets, account reclaim). Design history lives under `docs/superpowers/`.
+
+| | |
+|---|---|
+| Live UI | https://0xvoren.github.io/scoop/ |
+| Source | https://github.com/0xVoren/scoop |
+| BSC testnet Diamond | `0xfB2678ff49967B073F6537781EC3d35DE731a5DF` |
+| Solana program (devnet) | `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT` |
+
 Cross-chain rules: [`invariants-evm-solana.md`](invariants-evm-solana.md).  
-Research hardening: [`hardening-from-research.md`](hardening-from-research.md), [`github-similar-raffles.md`](github-similar-raffles.md).
+Research hardening: [`hardening-from-research.md`](hardening-from-research.md), [`github-similar-raffles.md`](github-similar-raffles.md).  
+Asset policy (UI + chain): [`asset-policy.md`](asset-policy.md).
 
 ## Fee (current)
 

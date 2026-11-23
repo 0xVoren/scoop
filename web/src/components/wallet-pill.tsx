@@ -99,7 +99,7 @@ function EvmWalletPill() {
   )
 }
 
-/** fork-style grey pill wallet button — EVM (RainbowKit) or Solana (wallet-adapter). */
+/** Compact wallet control — EVM (RainbowKit) or Solana (wallet-adapter). */
 export function WalletPill() {
   const { family } = useChainFamily()
   if (family === 'solana') return <SolanaWalletPill />

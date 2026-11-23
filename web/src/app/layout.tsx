@@ -9,7 +9,7 @@ const basePath = (process.env.NEXT_PUBLIC_BASE_PATH || '').replace(/\/$/, '')
 export const metadata: Metadata = {
   title: 'Scoop',
   description:
-    'Dual-chain on-chain share raffle — escrow a prize, sell fixed shares, draw on-chain. BSC testnet & Solana devnet.',
+    'Scoop — dual-chain on-chain share raffle. Escrow a prize, sell fixed shares, draw on-chain. BSC testnet and Solana devnet.',
   icons: {
     icon: [{ url: `${basePath}/favicon.svg`, type: 'image/svg+xml' }],
   },

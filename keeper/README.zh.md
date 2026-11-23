@@ -2,12 +2,12 @@
 
 [English](README.md)
 
-Permissionless **pendingDraw** 监控：到点调用 `drawMany` / `draw_many`。
+无需许可的 **pendingDraw** 监控：场次到达可开奖条件时调用 `drawMany` / `draw_many`。
 
-对齐 grid9 keeper：Cron 兜底 + HTTP `POST /trigger`；开奖本身任何人可调，keeper 只是自动开奖。  
-前端配 `NEXT_PUBLIC_KEEPER_URL` 后，详情页开奖就绪会 fire-and-forget POST `/trigger`（用户仍可手动 `draw`）。
+开奖本身任何人可调；keeper 仅负责自动化（Cron 兜底 + HTTP `POST /trigger`）。  
+前端配置 `NEXT_PUBLIC_KEEPER_URL` 后，详情页在开奖就绪时会 fire-and-forget POST `/trigger`（用户仍可手动 `draw`）。
 
-支持 **EVM** 与 **Solana** 两条执行路径（`KEEPER_CHAIN` 选择）。
+通过 `KEEPER_CHAIN` 支持 **EVM** 与 **Solana**。运维见 [`docs/keeper-testnet-ops.zh.md`](../docs/keeper-testnet-ops.zh.md)。
 
 ## 环境变量
 

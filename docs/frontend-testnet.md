@@ -2,11 +2,15 @@
 
 [中文](frontend-testnet.zh.md)
 
-**Date:** 2026-11-21  
-**Scope:** `web/` pointed at the deployed BSC testnet Diamond + Solana devnet program; local `pnpm typecheck` / Biome / `pnpm dev` smoke.  
-**Secrets:** Private keys / mnemonics / confidential WalletConnect keys must **not** be written into the repo or this file; put them only in local `web/.env.local` (already gitignored).
+Configure `web/` against the deployed BSC testnet Diamond and Solana devnet program for local acceptance (`pnpm typecheck` / Biome / `pnpm dev`).
 
-Contract addresses and on-chain evidence: [`testnet-contracts-deploy.md`](testnet-contracts-deploy.md).
+**Secrets:** Private keys, mnemonics, and confidential WalletConnect credentials must **not** enter the repo or this file — use local `web/.env.local` only (gitignored).
+
+| | |
+|---|---|
+| Live Pages | https://0xvoren.github.io/scoop/ |
+| Deploy record | [`testnet-contracts-deploy.md`](testnet-contracts-deploy.md) |
+| Pages CI defaults | [`github-pages-testnet.md`](github-pages-testnet.md) |
 
 ---
 

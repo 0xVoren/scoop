@@ -2,11 +2,11 @@
 
 [中文](keeper-testnet-ops.zh.md)
 
-**Date:** 2026-11-21  
-**Scope:** Live keeper ticks against the deployed testnets (BSC Chapel + Solana devnet) + alerts / secrets / RPC / mainnet notes.  
-**Secrets:** Private keys / mnemonics / keypair JSON **must not** be committed or written into the Agent Store; use local paths, 1Password, or Workers secrets only.
+Run the Scoop keeper against deployed testnets (BSC Chapel + Solana devnet): ticks, alerts, secrets, RPC, and notes that feed the mainnet runbook.
 
-Contract addresses: [`testnet-contracts-deploy.md`](testnet-contracts-deploy.md). Mainnet runbook: [`mainnet-runbook.md`](mainnet-runbook.md).
+**Secrets:** Private keys, mnemonics, and keypair JSON **must not** be committed or written into the Agent Store — use local paths, 1Password, or Workers secrets only.
+
+Contract addresses: [`testnet-contracts-deploy.md`](testnet-contracts-deploy.md). Mainnet runbook: [`mainnet-runbook.md`](mainnet-runbook.md). Package: [`keeper/README.md`](../keeper/README.md).
 
 ---
 

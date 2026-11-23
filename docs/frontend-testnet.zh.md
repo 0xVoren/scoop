@@ -2,11 +2,15 @@
 
 [English](frontend-testnet.md)
 
-**日期：** 2026-11-21  
-**范围：** `web/` 指向已部署的 BSC testnet Diamond + Solana devnet program；本地 `pnpm typecheck` / Biome / `pnpm dev` 冒烟。  
-**机密：** 私钥 / 助记词 / 需保密的 WalletConnect 密钥**不要**写入仓库或本文件；只放本机 `web/.env.local`（已 gitignore）。
+将 `web/` 指向已部署的 BSC 测试网 Diamond 与 Solana devnet 程序，用于本地验收（`pnpm typecheck` / Biome / `pnpm dev`）。
 
-合约地址与链上证据见 [`testnet-contracts-deploy.md`](testnet-contracts-deploy.md)。
+**机密：** 私钥、助记词与需保密的 WalletConnect 凭证**不得**写入仓库或本文件——仅放本机 `web/.env.local`（已 gitignore）。
+
+| | |
+|---|---|
+| 线上 Pages | https://0xvoren.github.io/scoop/ |
+| 部署记录 | [`testnet-contracts-deploy.zh.md`](testnet-contracts-deploy.zh.md) |
+| Pages CI 默认 | [`github-pages-testnet.zh.md`](github-pages-testnet.zh.md) |
 
 ---
 

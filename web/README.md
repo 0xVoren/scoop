@@ -2,9 +2,18 @@
 
 [中文](README.zh.md)
 
-Next.js App Router + wagmi / RainbowKit (EVM) + Solana wallet-adapter frontend.  
-Talks to Scoop Diamond (BSC / Anvil) and the Scoop Anchor program (Solana).  
-**Static export** (`output: 'export'`), suitable for **GitHub Pages**.
+Next.js App Router frontend for Scoop: wagmi / RainbowKit (EVM) and Solana wallet-adapter.  
+Talks to the Scoop Diamond (BSC / Anvil) and the Scoop Anchor program (Solana).  
+**Static export** (`output: 'export'`) for **GitHub Pages**.
+
+| | |
+|---|---|
+| Live | https://0xvoren.github.io/scoop/ |
+| Repo | https://github.com/0xVoren/scoop |
+| Pages runbook | [`docs/github-pages-testnet.md`](../docs/github-pages-testnet.md) |
+| Local testnet env | [`docs/frontend-testnet.md`](../docs/frontend-testnet.md) |
+| BSC testnet Diamond | `0xfB2678ff49967B073F6537781EC3d35DE731a5DF` |
+| Solana program | `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT` |
 
 ## Setup
 
@@ -47,10 +56,9 @@ NEXT_PUBLIC_SOLANA_RPC=http://127.0.0.1:8899
 ```
 
 3. `pnpm dev` → switch header to **Solana** → connect Phantom/Solflare (localnet).
-4. **Pages branch on ActiveChain**: `/create`, `/raffle/?id=` buy/draw/claim/refund/recover, and the home rough list use `useSolanaWrites` / `fetchSolanaRaffleById` when `family=solana`; EVM still uses wagmi.  
-   Draw randomness is **SlotHashes** (matches the invariant table; no VRF).
-5. Reads: `fetchSolanaRaffleById`; list via `listSolanaRafflesRough` (sequential recent ids, **not** a full index).  
-   `/me`, `/user`, `/token` show honest empty states on Solana (no event/secondary index).
+4. **ActiveChain branching**: `/create`, `/raffle/?id=` (buy / draw / claim / refund / recover), and the home list use Solana adapters when `family=solana`; EVM uses wagmi. Draw entropy is **SlotHashes** (no VRF).
+5. Reads: `fetchSolanaRaffleById`; home list via sequential recent ids (**not** a full index).  
+   `/me` lists Solana purchases via **BuyerRecord GPA**. `/user` and `/token` have no secondary indexes on Solana and show an explicit empty / limitation state.
 
 Native SOL sentinel = `Pubkey::default()` (`1111…1111`); explicit wSOL mint uses ordinary SPL (no auto-wrap).  
 Wallets: Solana → `WalletPill` (wallet-adapter); EVM → RainbowKit.

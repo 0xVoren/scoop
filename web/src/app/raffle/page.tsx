@@ -73,7 +73,7 @@ function RaffleDetailInner() {
             {r.totalShares} {t('detailSold')}
           </p>
         </div>
-        <button type="button" className="btn sm" onClick={() => void copyLink()}>
+        <button type="button" className="btn sm touch" onClick={() => void copyLink()}>
           {t('copyLink')}
         </button>
       </div>

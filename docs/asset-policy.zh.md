@@ -1,10 +1,11 @@
-# Scoop Asset Policy
+# Scoop 资产策略
 
 [English](asset-policy.md)
 
-**Status:** product + on-chain policy for mainnet readiness  
-**Rule source:** [`PROTOCOL.md`](PROTOCOL.md) §Supported assets · [`invariants-evm-solana.md`](invariants-evm-solana.md) §2 · [`hardening-from-research.md`](hardening-from-research.md)  
-**UI copy keys:** `web/src/lib/i18n.tsx` (see §4)
+Scoop 接受哪些资产作为奖池或支付的产品与链上规则。双链通用；主网就绪前 UI 文案须与这些闸门一致。
+
+**规则源：** [`PROTOCOL.md`](PROTOCOL.md) §Supported assets · [`invariants-evm-solana.md`](invariants-evm-solana.md) §2 · [`hardening-from-research.md`](hardening-from-research.md)  
+**UI 文案键：** `web/src/lib/i18n.tsx`（见 §4）
 
 ---
 

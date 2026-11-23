@@ -1,13 +1,18 @@
-# Scoop Solana Programs (Anchor MVP)
+# Scoop Solana Programs (Anchor)
 
 [中文](README.zh.md)
 
-Same product semantics as the EVM Diamond. Rule source: [`docs/invariants-evm-solana.md`](../docs/invariants-evm-solana.md).
+Solana implementation of Scoop with the same product semantics as the EVM Diamond.  
+Rule source: [`docs/invariants-evm-solana.md`](../docs/invariants-evm-solana.md).
 
-**Program ID (localnet / intended devnet keypair):** `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT`
+| | |
+|---|---|
+| Program ID | `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT` |
+| Cluster (public) | Solana **devnet** |
+| Explorer | https://explorer.solana.com/address/FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT?cluster=devnet |
+| Deploy notes | [`docs/solana-testnet-deploy.md`](../docs/solana-testnet-deploy.md) · [`docs/testnet-contracts-deploy.md`](../docs/testnet-contracts-deploy.md) |
 
-**Testnet deploy:** [`docs/solana-testnet-deploy.md`](../docs/solana-testnet-deploy.md) · summary [`docs/testnet-contracts-deploy.md`](../docs/testnet-contracts-deploy.md).  
-**Already on devnet** (same Program ID; initialize + create→buy→draw smoke passed). Local verify: `bash scripts/e2e-solana-local.sh`.
+Devnet already hosts this Program ID (initialize + create→buy→draw smoke passed). Local verification: `bash scripts/e2e-solana-local.sh`.
 
 ```bash
 # Devnet: deploy .so + initialize (key path via env; never commit secrets)

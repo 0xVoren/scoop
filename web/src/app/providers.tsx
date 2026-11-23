@@ -23,9 +23,9 @@ function AppProviders({ children }: { children: React.ReactNode }) {
           key={locale}
           locale={locale === 'zh' ? 'zh-CN' : 'en-US'}
           theme={darkTheme({
-            accentColor: '#238636',
+            accentColor: '#0b6b53',
             accentColorForeground: '#ffffff',
-            borderRadius: 'small',
+            borderRadius: 'medium',
             fontStack: 'system',
             overlayBlur: 'small',
           })}
@@ -33,7 +33,15 @@ function AppProviders({ children }: { children: React.ReactNode }) {
           <SolanaWalletProvider>
             <ActiveChainProvider>
               {children}
-              <Toaster position="top-center" richColors />
+              <Toaster
+                position="top-center"
+                richColors
+                closeButton
+                toastOptions={{
+                  className: 'scoop-toast',
+                  duration: 4200,
+                }}
+              />
             </ActiveChainProvider>
           </SolanaWalletProvider>
         </RainbowKitProvider>

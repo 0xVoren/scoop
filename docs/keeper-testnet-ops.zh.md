@@ -2,11 +2,11 @@
 
 [English](keeper-testnet-ops.md)
 
-**日期：** 2026-11-21  
-**范围：** 已部署测试网 Keeper 实机 tick（BSC Chapel + Solana devnet）+ 告警 / 密钥 / RPC / 主网注意。  
-**机密：** 私钥 / 助记词 / keypair JSON **禁止**入库或写入 Agent Store；只用本机路径、1Password、或 Workers secrets。
+在已部署测试网（BSC Chapel + Solana devnet）上运行 Scoop keeper：tick、告警、密钥、RPC，以及供主网手册引用的注意项。
 
-合约地址见 [`testnet-contracts-deploy.md`](testnet-contracts-deploy.md)。主网总册见 [`mainnet-runbook.md`](mainnet-runbook.md)。
+**机密：** 私钥、助记词与 keypair JSON **禁止**入库或写入 Agent Store — 仅用本机路径、1Password 或 Workers secrets。
+
+合约地址见 [`testnet-contracts-deploy.zh.md`](testnet-contracts-deploy.zh.md)。主网总册见 [`mainnet-runbook.md`](mainnet-runbook.md)。包说明：[`keeper/README.zh.md`](../keeper/README.zh.md)。
 
 ---
 

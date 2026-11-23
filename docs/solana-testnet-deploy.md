@@ -2,10 +2,14 @@
 
 [中文](solana-testnet-deploy.zh.md)
 
-**Date:** 2026-11-20  
-**Cluster:** Solana **devnet** (when the product says “testnet”, this is the default; not testnet-beta)  
-**Randomness:** SlotHashes (**no VRF**)  
-**Program ID (keypair):** `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT`
+Deploy and verify the Scoop Anchor program on Solana **devnet** (the product default when docs say “testnet”; not testnet-beta).
+
+| | |
+|---|---|
+| Program ID | `FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT` |
+| Randomness | SlotHashes (**no VRF**) |
+| Explorer | https://explorer.solana.com/address/FC9im2jkXhYciLgvEMTgrmvmKMPFkehyM1g3EEnUrpHT?cluster=devnet |
+| Live UI | https://0xvoren.github.io/scoop/ |
 
 > Secrets (private keys / mnemonics / JSON keypairs) stay in local `~/.config/solana/` or CI secrets; **do not** write them into the Agent Store / git.
 

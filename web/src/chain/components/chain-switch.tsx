@@ -3,10 +3,7 @@
 import { useChainFamily } from '@/chain/selection'
 import { useT } from '@/lib/i18n'
 
-/**
- * Minimal family switcher — reuses existing `.pill` chrome; no visual redesign.
- * Click toggles EVM ↔ Solana.
- */
+/** EVM ↔ Solana family switcher (header pill). */
 export function ChainSwitch() {
   const t = useT()
   const { family, setFamily, meta } = useChainFamily()

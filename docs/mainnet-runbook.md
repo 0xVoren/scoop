@@ -1,9 +1,11 @@
 # Scoop Mainnet Runbook
 
-**Status:** preparation only — **do not deploy mainnet until the operator explicitly orders it**  
+Preparation-only checklist for a future mainnet cutover. **Do not deploy mainnet until the operator explicitly orders it.** This document does not invent mainnet addresses.
+
 **Rule source:** [`PROTOCOL.md`](PROTOCOL.md) · [`invariants-evm-solana.md`](invariants-evm-solana.md)  
 **Practice reference (testnet / devnet):** [`testnet-contracts-deploy.md`](testnet-contracts-deploy.md) · [`solana-testnet-deploy.md`](solana-testnet-deploy.md) · [`testnet-full-e2e.md`](testnet-full-e2e.md)  
-**Companion:** [`security-checklist-mainnet.md`](security-checklist-mainnet.md) · [`mainnet-canary.md`](mainnet-canary.md) · [`asset-policy.md`](asset-policy.md)
+**Companion:** [`security-checklist-mainnet.md`](security-checklist-mainnet.md) · [`mainnet-canary.md`](mainnet-canary.md) · [`asset-policy.md`](asset-policy.md)  
+**Current public UI:** https://0xvoren.github.io/scoop/ (testnets only)
 
 **Secrets:** private keys, mnemonics, and upgrade keypaths stay in local env / Foundry keystore / Solana CLI / 1Password. Never paste into this file, chat, or Agent Store.
 

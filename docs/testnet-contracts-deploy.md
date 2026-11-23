@@ -2,9 +2,14 @@
 
 [中文](testnet-contracts-deploy.zh.md)
 
-**Date:** 2026-11-21  
-**Scope:** Contracts only (BSC testnet Diamond + Solana devnet program); excludes frontend Pages / live keeper / mainnet.  
-**Secrets:** Private keys / mnemonics stay in local env, Foundry keystore, Solana CLI, or 1Password; **do not** write them into this file or the Agent Store.
+Authoritative record of the BSC testnet Diamond and Solana devnet program deployments used by the public UI. Excludes frontend Pages cutover, live keeper ops, and mainnet.
+
+**Secrets:** Private keys and mnemonics stay in local env, Foundry keystore, Solana CLI, or 1Password — **never** in this file or the Agent Store.
+
+| | |
+|---|---|
+| Live UI | https://0xvoren.github.io/scoop/ |
+| Repo | https://github.com/0xVoren/scoop |
 
 ---
 
