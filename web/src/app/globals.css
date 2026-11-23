@@ -611,10 +611,11 @@ kbd {
 
 .tabs {
   display: flex;
-  gap: 4px;
-  padding: 0 var(--gut-r) 0 var(--gut);
+  gap: 6px;
+  padding: 0 var(--gut-r) 8px var(--gut);
   overflow-x: auto;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .buy-stack {
@@ -973,7 +974,7 @@ kbd {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  margin: 28px 0 16px;
+  margin: 28px 0 18px;
 }
 
 .section-h h2 {
@@ -1071,9 +1072,10 @@ kbd {
   border: 1px solid var(--rule-2);
   border-radius: var(--r);
   background: var(--bg-2);
-  padding: 14px 16px;
+  padding: 16px;
   color: inherit;
   box-shadow: var(--shadow);
+  gap: 2px;
   transition:
     border-color 0.2s var(--ease),
     transform 0.2s var(--ease);
@@ -1169,6 +1171,53 @@ kbd {
   line-height: 1.55;
 }
 
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.skeleton-card {
+  min-height: 168px;
+  border-radius: var(--r);
+  border: 1px solid var(--rule);
+  background: linear-gradient(
+    110deg,
+    var(--bg-3) 0%,
+    var(--bg-2) 40%,
+    var(--bg-3) 80%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-card {
+    animation: none;
+  }
+}
+
+.archive-sect {
+  margin-top: 36px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.archive-lead {
+  margin: -6px 0 14px;
+  max-width: 52ch;
+}
+
 .empty a {
   font-weight: 500;
 }
@@ -1183,7 +1232,8 @@ kbd {
 .actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  max-width: 520px;
 }
 
 .create-form label,
@@ -1286,11 +1336,11 @@ a.addr-value:hover {
 /* ——— Footer ——— */
 .foot {
   max-width: var(--page);
-  margin: 48px auto 0;
-  padding: 28px var(--gut) calc(32px + env(safe-area-inset-bottom, 0px));
+  margin: 56px auto 0;
+  padding: 32px var(--gut) calc(36px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--rule);
   display: grid;
-  gap: 20px;
+  gap: 22px;
   font-size: 13px;
   color: var(--ink-2);
 }

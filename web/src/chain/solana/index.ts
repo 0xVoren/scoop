@@ -10,6 +10,10 @@ export {
   isNativeMint,
   NATIVE_MINT_BYTES,
   NATIVE_MINT_PUBKEY,
+  RAFFLE_CREATOR_OFFSET,
+  RAFFLE_DATA_SIZE,
+  RAFFLE_DISCRIMINATOR,
+  RAFFLE_PRIZE_MINT_OFFSET,
   RaffleStatus,
   SLOT_HASHES_SYSVAR,
   TOKEN_PROGRAM_ID,
@@ -47,6 +51,11 @@ export {
   shareBoardPda,
 } from '@/chain/solana/pdas'
 export {
+  raffleAccountFilters,
+  raffleFiltersForCreator,
+  raffleFiltersForPrizeMint,
+} from '@/chain/solana/raffle-filters'
+export {
   fetchSolanaBuyerRecord,
   fetchSolanaConfig,
   fetchSolanaRaffleAccount,
@@ -56,8 +65,13 @@ export {
   fetchSolanaShareOwner,
   listSolanaBuyerRecordsByBuyer,
   listSolanaPurchasesForBuyer,
+  listSolanaRaffles,
+  listSolanaRafflesByCreator,
+  listSolanaRafflesByPrizeMint,
   listSolanaRafflesRough,
   type SolanaBuyerPurchase,
+  type SolanaRaffleListResult,
+  type SolanaRaffleListSource,
 } from '@/chain/solana/reads'
 export { useSolanaWrites } from '@/chain/solana/useSolanaWrites'
 export { SolanaWalletProvider } from '@/chain/solana/wallet-provider'

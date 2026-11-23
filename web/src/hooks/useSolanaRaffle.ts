@@ -13,7 +13,9 @@ import {
   fetchSolanaRaffleById,
   fetchSolanaShareCount,
   fetchSolanaShareOwner,
-  listSolanaRafflesRough,
+  listSolanaRaffles,
+  listSolanaRafflesByCreator,
+  listSolanaRafflesByPrizeMint,
 } from '@/chain/solana/reads'
 import { isMarketplaceActive, sortByMarketplace } from '@/lib/scoop'
 
@@ -97,44 +99,127 @@ export function useSolanaProtocolConfig() {
 
 export type ListedSolanaRaffle = EvmRaffleView & { orderId: bigint }
 
+function toListed(m: Parameters<typeof fromRaffleReadModel>[0]): ListedSolanaRaffle {
+  return { orderId: m.raffleId, ...fromRaffleReadModel(m) }
+}
+
 /**
- * Home list for Solana: sequential id scan only — not a full index.
- * Surfaces `incomplete: true` so UI can warn honestly.
+ * Home list for Solana: getProgramAccounts on Raffle accounts (primary).
+ * Live = Selling / SoldOut; settled archive = Drawn / Expired (effective).
+ * Surfaces `gpaFailed` when RPC blocks GPA (recent-id fallback).
  */
-export function useSolanaRaffleList(opts: { limit?: number } = {}) {
+export function useSolanaRaffleList() {
   const { connection } = useConnection()
   const pid = programId()
-  const limit = opts.limit ?? 48
 
   const q = useQuery({
-    queryKey: ['solana-raffle-list', pid, limit],
-    queryFn: () => listSolanaRafflesRough(connection, pid, { limit }),
+    queryKey: ['solana-raffle-list', pid],
+    queryFn: () => listSolanaRaffles(connection, pid),
   })
 
-  const raffles = useMemo(() => {
+  const listed = useMemo(() => {
     if (!q.data) return [] as ListedSolanaRaffle[]
-    const list: ListedSolanaRaffle[] = q.data.raffles.map((m) => ({
-      orderId: m.raffleId,
-      ...fromRaffleReadModel(m),
-    }))
-    return sortByMarketplace(list, { activeOnly: true })
+    return q.data.raffles.map(toListed)
   }, [q.data])
 
+  const raffles = useMemo(() => sortByMarketplace(listed, { activeOnly: true }), [listed])
+
+  const settled = useMemo(
+    () =>
+      sortByMarketplace(listed.filter((r) => !isMarketplaceActive(r.status, r.deadline))).slice(
+        0,
+        24,
+      ),
+    [listed],
+  )
+
   const nextId = q.data?.nextRaffleId
-  const hasAnyOnChain = Boolean(nextId && nextId > BigInt(1))
+  const hasAnyOnChain = Boolean((nextId && nextId > BigInt(1)) || listed.length > 0)
+  const gpaFailed = Boolean(q.data?.gpaFailed)
 
   return {
     raffles,
+    settled,
     isLoading: q.isLoading,
     isFetching: q.isFetching,
     refetch: q.refetch,
     nextId,
     hasAnyOnChain,
-    /** Always true for Solana MVP — no secondary / event index. */
-    incomplete: true as const,
+    /** True only when GPA failed and we fell back to a bounded recent-id scan. */
+    incomplete: gpaFailed,
+    gpaFailed,
+    source: q.data?.source,
     canLoadMore: false,
     scannedAll: true,
     loadMore: () => {},
+  }
+}
+
+/** Creator browse via Raffle.creator GPA memcmp. */
+export function useSolanaCreatorOrders(creator: string | undefined) {
+  const { connection } = useConnection()
+  const pid = programId()
+  const enabled = Boolean(creator)
+
+  const q = useQuery({
+    queryKey: ['solana-creator-raffles', pid, creator],
+    enabled,
+    queryFn: () => listSolanaRafflesByCreator(connection, pid, creator!),
+  })
+
+  const cards = useMemo(() => {
+    if (!q.data) return [] as ListedSolanaRaffle[]
+    return sortByMarketplace(q.data.raffles.map(toListed))
+  }, [q.data])
+
+  const active = useMemo(
+    () => cards.filter((c) => isMarketplaceActive(c.status, c.deadline)),
+    [cards],
+  )
+  const settled = useMemo(
+    () => cards.filter((c) => !isMarketplaceActive(c.status, c.deadline)),
+    [cards],
+  )
+
+  return {
+    count: cards.length,
+    active,
+    settled,
+    isLoading: enabled && q.isLoading,
+    isFetching: q.isFetching,
+    canLoadMore: false,
+    loadMore: () => {},
+    refetch: q.refetch,
+    gpaFailed: Boolean(q.data?.gpaFailed),
+  }
+}
+
+/** Prize-mint browse via Raffle.prize_mint GPA memcmp (live only, like EVM). */
+export function useSolanaTokenOrders(prizeMint: string | undefined) {
+  const { connection } = useConnection()
+  const pid = programId()
+  const enabled = Boolean(prizeMint)
+
+  const q = useQuery({
+    queryKey: ['solana-token-raffles', pid, prizeMint],
+    enabled,
+    queryFn: () => listSolanaRafflesByPrizeMint(connection, pid, prizeMint!),
+  })
+
+  const cards = useMemo(() => {
+    if (!q.data) return [] as ListedSolanaRaffle[]
+    return sortByMarketplace(q.data.raffles.map(toListed), { activeOnly: true })
+  }, [q.data])
+
+  return {
+    count: cards.length,
+    cards,
+    isLoading: enabled && q.isLoading,
+    isFetching: q.isFetching,
+    canLoadMore: false,
+    loadMore: () => {},
+    refetch: q.refetch,
+    gpaFailed: Boolean(q.data?.gpaFailed),
   }
 }
 
@@ -148,7 +233,7 @@ export function useSolanaSlot(enabled: boolean) {
   })
 }
 
-/** True when a marketplace-active raffle exists in the rough window. */
+/** True when a marketplace-active raffle exists in the listed set. */
 export function solanaHasActive(raffles: ListedSolanaRaffle[]): boolean {
   return raffles.some((r) => isMarketplaceActive(r.status, r.deadline))
 }

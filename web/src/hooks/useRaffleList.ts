@@ -98,7 +98,7 @@ function useEvmRaffleList() {
   }
 }
 
-/** Browse list: active marketplace only; Solana uses rough sequential scan (incomplete). */
+/** Browse list: active marketplace only; Solana uses Raffle GPA (+ settled archive). */
 export function useRaffleList() {
   const { family } = useChainFamily()
   const evm = useEvmRaffleList()
@@ -107,6 +107,7 @@ export function useRaffleList() {
   if (family === 'solana') {
     return {
       raffles: sol.raffles,
+      settled: sol.settled,
       isLoading: sol.isLoading,
       isFetching: sol.isFetching,
       refetch: sol.refetch,
@@ -116,7 +117,8 @@ export function useRaffleList() {
       scannedAll: sol.scannedAll,
       loadMore: sol.loadMore,
       incomplete: sol.incomplete,
+      gpaFailed: sol.gpaFailed,
     }
   }
-  return evm
+  return { ...evm, settled: [] as ListedRaffle[], gpaFailed: false }
 }

@@ -43,6 +43,17 @@ export const BUYER_RECORD_DISCRIMINATOR = Uint8Array.from([107, 122, 54, 31, 4, 
 export const BUYER_RECORD_DATA_SIZE = 62
 export const BUYER_RECORD_BUYER_OFFSET = 16
 
+/** Anchor `account:Raffle` discriminator (sha256[0..8]). */
+export const RAFFLE_DISCRIMINATOR = Uint8Array.from([143, 133, 63, 173, 138, 10, 142, 200])
+
+/**
+ * Fixed Raffle account size (InitSpace + 8 disc).
+ * creator @16, prize_mint @48 after disc+raffle_id.
+ */
+export const RAFFLE_DATA_SIZE = 174
+export const RAFFLE_CREATOR_OFFSET = 16
+export const RAFFLE_PRIZE_MINT_OFFSET = 48
+
 export enum RaffleStatus {
   Selling = 0,
   SoldOut = 1,

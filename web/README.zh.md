@@ -57,7 +57,7 @@ NEXT_PUBLIC_SOLANA_RPC=http://127.0.0.1:8899
 
 3. `pnpm dev` → header 切到 **Solana** → Phantom/Solflare（localnet）连接。
 4. **按 ActiveChain 分支**：`/create`、`/raffle/?id=`（买 / 开奖 / 领奖 / 退款 / 收回）与首页列表在 `family=solana` 时走 Solana 适配；EVM 走 wagmi。开奖熵源为 **SlotHashes**（无 VRF）。
-5. 读：`fetchSolanaRaffleById`；首页列表为顺序扫描近期 id（**不是**全站索引）。  
+5. 读：`fetchSolanaRaffleById`；首页列表通过 Raffle 账户 `getProgramAccounts`（GPA 失败时回退有界近期 id 扫描）。  
    `/me` 通过 **BuyerRecord GPA** 列出 Solana 购买记录。`/user`、`/token` 在 Solana 无次级索引，展示明确空态 / 限制说明。
 
 原生 SOL 哨兵 = `Pubkey::default()`（`1111…1111`）；显式 wSOL mint 走普通 SPL，不 auto-wrap。  

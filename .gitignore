@@ -24,3 +24,6 @@ keeper/.wrangler/
 !.env.example
 **/.env.local
 **/*.pem
+
+# Local script outputs
+scripts/*.result.json

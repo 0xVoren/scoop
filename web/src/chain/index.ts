@@ -32,6 +32,9 @@ export {
 } from '@/chain/selection'
 export {
   fetchSolanaRaffleById,
+  listSolanaRaffles,
+  listSolanaRafflesByCreator,
+  listSolanaRafflesByPrizeMint,
   listSolanaRafflesRough,
   useSolanaWrites,
 } from '@/chain/solana'

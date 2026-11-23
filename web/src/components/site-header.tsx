@@ -1,5 +1,6 @@
 'use client'
 
+import { PublicKey } from '@solana/web3.js'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { type FormEvent, useEffect, useState } from 'react'
@@ -7,6 +8,8 @@ import { isAddress } from 'viem'
 import { usePublicClient } from 'wagmi'
 import { scoopAbi } from '@/abi/scoop'
 import { ChainSwitch } from '@/chain/components/chain-switch'
+import { useChainFamily } from '@/chain/selection'
+import { NATIVE_MINT_PUBKEY } from '@/chain/solana/constants'
 import { WalletPill } from '@/components/wallet-pill'
 import { useI18n } from '@/lib/i18n'
 import { rafflePath, tokenPath, userPath } from '@/lib/paths'
@@ -59,6 +62,7 @@ export function SiteHeader() {
   const pathname = usePathname()
   const router = useRouter()
   const publicClient = usePublicClient()
+  const { family } = useChainFamily()
   const { locale, setLocale, t } = useI18n()
   const [q, setQ] = useState('')
   const [mobileSearch, setMobileSearch] = useState(false)
@@ -113,6 +117,22 @@ export function SiteHeader() {
       setMobileSearch(false)
       return
     }
+
+    if (family === 'solana') {
+      try {
+        const pk = new PublicKey(raw)
+        const b58 = pk.toBase58()
+        // Native SOL sentinel → prize-mint browse; otherwise creator browse.
+        const goToken = pk.equals(NATIVE_MINT_PUBKEY)
+        router.push(goToken ? tokenPath(b58) : userPath(b58))
+        setQ('')
+        setMobileSearch(false)
+      } catch {
+        // ignore invalid pubkey
+      }
+      return
+    }
+
     if (!isAddress(raw)) return
     if (raw.toLowerCase() === NATIVE.toLowerCase()) {
       router.push(tokenPath(NATIVE))

@@ -15,10 +15,24 @@ import {
   type ShareBoardAccount,
 } from '@/chain/solana/decode'
 import { buyerRecordPda, configPda, rafflePda, shareBoardPda } from '@/chain/solana/pdas'
+import {
+  raffleAccountFilters,
+  raffleFiltersForCreator,
+  raffleFiltersForPrizeMint,
+} from '@/chain/solana/raffle-filters'
 import type { RaffleReadModel } from '@/chain/types'
 
-/** Default bound for recent-id BuyerRecord probe when GPA fails. */
+/** Default bound for recent-id BuyerRecord / raffle probe when GPA fails. */
 const FALLBACK_SCAN_LIMIT = 64
+
+export type SolanaRaffleListSource = 'gpa' | 'fallback'
+
+export type SolanaRaffleListResult = {
+  raffles: RaffleReadModel[]
+  source: SolanaRaffleListSource
+  gpaFailed: boolean
+  nextRaffleId: bigint
+}
 
 export async function fetchSolanaConfig(
   connection: Connection,
@@ -54,10 +68,8 @@ export async function fetchSolanaRaffleById(
 }
 
 /**
- * Rough sequential scan of raffle ids `1 .. next_raffle_id-1` (capped).
- *
- * NOT a full product index — Solana MVP has no creator/prize secondary indexes
- * and no event indexer. Callers must surface this limitation to users.
+ * Sequential scan of raffle ids `1 .. next_raffle_id-1` (capped).
+ * Used only as fallback when getProgramAccounts is refused by the RPC.
  */
 export async function listSolanaRafflesRough(
   connection: Connection,
@@ -78,6 +90,115 @@ export async function listSolanaRafflesRough(
     if (r) raffles.push(r)
   }
   return { raffles, incomplete: true, nextRaffleId: end }
+}
+
+function sortRafflesDesc(raffles: RaffleReadModel[]): RaffleReadModel[] {
+  return raffles.sort((a, b) => (a.raffleId < b.raffleId ? 1 : a.raffleId > b.raffleId ? -1 : 0))
+}
+
+/**
+ * Primary home discovery: getProgramAccounts on Raffle accounts
+ * (discriminator + fixed size). Falls back to bounded recent-id scan when GPA fails.
+ */
+export async function listSolanaRaffles(
+  connection: Connection,
+  programId: PublicKey | string,
+  opts: { fallbackScanLimit?: number } = {},
+): Promise<SolanaRaffleListResult> {
+  const pid = typeof programId === 'string' ? new PublicKey(programId) : programId
+  const config = await fetchSolanaConfig(connection, pid)
+  const nextRaffleId = config?.nextRaffleId ?? 1n
+
+  try {
+    const accounts = await connection.getProgramAccounts(pid, {
+      commitment: 'confirmed',
+      filters: raffleAccountFilters(),
+    })
+    const raffles = sortRafflesDesc(
+      accounts.map((a) => raffleAccountToReadModel(decodeRaffle(a.account.data))),
+    )
+    return { raffles, source: 'gpa', gpaFailed: false, nextRaffleId }
+  } catch {
+    // Public RPCs sometimes disable GPA — fall through.
+  }
+
+  const rough = await listSolanaRafflesRough(connection, pid, {
+    limit: opts.fallbackScanLimit ?? FALLBACK_SCAN_LIMIT,
+  })
+  return {
+    raffles: sortRafflesDesc(rough.raffles),
+    source: 'fallback',
+    gpaFailed: true,
+    nextRaffleId: rough.nextRaffleId,
+  }
+}
+
+/** Creator browse via GPA memcmp on Raffle.creator (client filter; no on-chain index). */
+export async function listSolanaRafflesByCreator(
+  connection: Connection,
+  programId: PublicKey | string,
+  creator: PublicKey | string,
+): Promise<SolanaRaffleListResult> {
+  const pid = typeof programId === 'string' ? new PublicKey(programId) : programId
+  const creatorPk = typeof creator === 'string' ? new PublicKey(creator) : creator
+  const config = await fetchSolanaConfig(connection, pid)
+  const nextRaffleId = config?.nextRaffleId ?? 1n
+
+  try {
+    const accounts = await connection.getProgramAccounts(pid, {
+      commitment: 'confirmed',
+      filters: raffleFiltersForCreator(creatorPk),
+    })
+    const raffles = sortRafflesDesc(
+      accounts.map((a) => raffleAccountToReadModel(decodeRaffle(a.account.data))),
+    )
+    return { raffles, source: 'gpa', gpaFailed: false, nextRaffleId }
+  } catch {
+    // Fall through to full list + client filter when possible.
+  }
+
+  const all = await listSolanaRaffles(connection, pid)
+  const want = creatorPk.toBase58()
+  return {
+    raffles: all.raffles.filter((r) => r.creator === want),
+    source: all.source,
+    gpaFailed: true,
+    nextRaffleId: all.nextRaffleId,
+  }
+}
+
+/** Prize-mint browse via GPA memcmp on Raffle.prize_mint. */
+export async function listSolanaRafflesByPrizeMint(
+  connection: Connection,
+  programId: PublicKey | string,
+  prizeMint: PublicKey | string,
+): Promise<SolanaRaffleListResult> {
+  const pid = typeof programId === 'string' ? new PublicKey(programId) : programId
+  const mintPk = typeof prizeMint === 'string' ? new PublicKey(prizeMint) : prizeMint
+  const config = await fetchSolanaConfig(connection, pid)
+  const nextRaffleId = config?.nextRaffleId ?? 1n
+
+  try {
+    const accounts = await connection.getProgramAccounts(pid, {
+      commitment: 'confirmed',
+      filters: raffleFiltersForPrizeMint(mintPk),
+    })
+    const raffles = sortRafflesDesc(
+      accounts.map((a) => raffleAccountToReadModel(decodeRaffle(a.account.data))),
+    )
+    return { raffles, source: 'gpa', gpaFailed: false, nextRaffleId }
+  } catch {
+    // Fall through.
+  }
+
+  const all = await listSolanaRaffles(connection, pid)
+  const want = mintPk.toBase58()
+  return {
+    raffles: all.raffles.filter((r) => r.prizeToken === want),
+    source: all.source,
+    gpaFailed: true,
+    nextRaffleId: all.nextRaffleId,
+  }
 }
 
 export async function fetchSolanaShareBoard(

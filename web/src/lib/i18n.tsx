@@ -35,8 +35,11 @@ const dict = {
     meHistory: '历史',
     meLoadMore: '加载更早记录',
     meCreatorTag: '我创建的',
-    solanaNoSecondaryIndex: 'Solana MVP 暂无创建者 / 奖池代币次级索引。',
+    solanaNoSecondaryIndex:
+      'Solana 创建者 / 奖池币列表由链上 Raffle 账户 GPA 过滤（无独立索引表）。',
     solanaOpenById: '请用场次 #ID 打开详情。返回',
+    solanaGpaFallback:
+      '当前 RPC 无法使用 getProgramAccounts；已回退为有界近期扫描，列表可能不完整。',
     outcomeWon: '中奖',
     outcomeLost: '未中',
     outcomePending: '待开奖',
@@ -62,13 +65,17 @@ const dict = {
     homeTitle: '进行中的场次',
     homeLead: '仅展示可买入或待开奖的场次。已结算请到「我的」或按场次 ID 搜索。',
     homeLeadSolana:
-      '仅展示可买入或待开奖的场次（顺序扫描近期 id，非全站索引）。已结束请搜场次 #ID。',
+      '仅展示可买入或待开奖的场次（链上 Raffle 账户全量发现）。已结算见下方归档或「我的」。',
     homeCreate: '创建场次',
     homeLoading: '加载场次…',
     homeEmpty: '暂无场次。部署合约并配置 NEXT_PUBLIC_SCOOP_DIAMOND 后，再创建第一场。',
     homeEmptySolana: '暂无场次。部署程序并配置 NEXT_PUBLIC_SOLANA_PROGRAM_ID 后，再创建第一场。',
     homeEmptyActive: '当前没有进行中或待开奖场次。已结算记录见',
-    homeSolanaIndexHint: '列表为顺序扫描近期 raffle id，不是全站索引；更早场次请直接搜 #ID。',
+    homeSolanaIndexHint:
+      '当前 RPC 禁用 getProgramAccounts，已回退为近期 id 扫描；列表可能不全。可换 RPC 或用 #ID 打开。',
+    homeArchiveTitle: '近期已结算',
+    homeArchiveLead: '已开奖或已过期场次。领取 / 退款请到「我的」。',
+    homeArchiveLink: '归档',
     homeLoadMore: '加载更多',
     aboutTitle: '协议说明',
     aboutBody:
@@ -87,7 +94,7 @@ const dict = {
     rulesBody:
       '启动默认：同币买卖 · 11 份 · 单价 = 奖池 / 10 · N = 5 块。首页仅列进行中场次；结算后在「我的」处理。费用与资产限制见 PROTOCOL。',
     rulesBodySolana:
-      '启动默认：同币买卖 · 11 份 · 单价 = 奖池 / 10 · N = 5 slot。首页顺序扫近期场次；结算后请搜 #ID。费用与资产限制见 PROTOCOL。',
+      '启动默认：同币买卖 · 11 份 · 单价 = 奖池 / 10 · N = 5 slot。首页列进行中场次；结算见归档或「我的」。费用与资产限制见 PROTOCOL。',
     statusTitle: '部署状态',
     statusBody:
       '本站指向 BSC 测试网 Diamond 与 Solana devnet 程序。非主网；资金与结果均以对应测试网为准。',
@@ -99,7 +106,8 @@ const dict = {
     errToken2022: '不支持 Token-2022。请使用经典 SPL Token。',
     assetPolicyFoTHint: '链上拒绝 fee-on-transfer / 税币（到账必须足额）。',
     assetPolicyToken2022Hint: 'Solana：仅经典 SPL Token；Token-2022 会被拒绝。',
-    assetPolicySolanaIndexHint: 'Solana 列表只顺序扫近期 id，不是全站索引；更早场次请搜 #ID。',
+    assetPolicySolanaIndexHint:
+      'Solana Live 通过 getProgramAccounts 发现全部 Raffle；部分公共 RPC 可能禁用 GPA（会回退并提示）。',
     viewTx: '查看交易',
     copyLink: '复制链接',
     copyLinkOk: '链接已复制',
@@ -257,8 +265,11 @@ const dict = {
     meHistory: 'History',
     meLoadMore: 'Load older',
     meCreatorTag: 'Created by me',
-    solanaNoSecondaryIndex: 'Solana MVP has no creator / prize-token secondary indexes.',
+    solanaNoSecondaryIndex:
+      'Solana creator / prize-mint lists use on-chain Raffle GPA filters (no separate index tables).',
     solanaOpenById: 'Open a raffle by #ID. Back to',
+    solanaGpaFallback:
+      'This RPC could not run getProgramAccounts; fell back to a bounded recent scan — list may be incomplete.',
     outcomeWon: 'Won',
     outcomeLost: 'Lost',
     outcomePending: 'Pending draw',
@@ -285,7 +296,7 @@ const dict = {
     homeLead:
       'Buyable or awaiting-draw raffles only. Settled records are under Me, or search by raffle ID.',
     homeLeadSolana:
-      'Buyable or awaiting-draw raffles only (recent ids scanned sequentially — not a full index). Settled: search by #ID.',
+      'Buyable or awaiting-draw raffles only (discovered via on-chain Raffle accounts). Settled: archive below or Me.',
     homeCreate: 'Create raffle',
     homeLoading: 'Loading raffles…',
     homeEmpty:
@@ -294,7 +305,10 @@ const dict = {
       'No raffles yet. Deploy the program and configure NEXT_PUBLIC_SOLANA_PROGRAM_ID, then create the first one.',
     homeEmptyActive: 'Nothing live right now. Settled records are under',
     homeSolanaIndexHint:
-      'List scans recent raffle ids in order — not a full site index. Older raffles: search by #ID.',
+      'This RPC blocks getProgramAccounts; fell back to a recent-id scan — list may be incomplete. Switch RPC or open by #ID.',
+    homeArchiveTitle: 'Recently settled',
+    homeArchiveLead: 'Drawn or expired raffles. Claim / refund under Me.',
+    homeArchiveLink: 'archive',
     homeLoadMore: 'Load more',
     aboutTitle: 'Protocol',
     aboutBody:
@@ -313,7 +327,7 @@ const dict = {
     rulesBody:
       'Launch defaults: same token · 11 shares · price = prize / 10 · N = 5 blocks. Home lists live raffles only; settle under Me. Fees and asset limits: see PROTOCOL.',
     rulesBodySolana:
-      'Launch defaults: same token · 11 shares · price = prize / 10 · N = 5 slots. Home scans recent ids; after settlement search by #ID. Fees and asset limits: see PROTOCOL.',
+      'Launch defaults: same token · 11 shares · price = prize / 10 · N = 5 slots. Home lists live raffles; settled under archive or Me. Fees and asset limits: see PROTOCOL.',
     statusTitle: 'Deployment status',
     statusBody:
       'This site points at a BSC testnet Diamond and a Solana devnet program. Not mainnet; funds and outcomes follow those testnets.',
@@ -327,7 +341,7 @@ const dict = {
     assetPolicyFoTHint: 'Fee-on-transfer and tax tokens are rejected on-chain.',
     assetPolicyToken2022Hint: 'Solana: classic SPL Token only — Token-2022 is rejected.',
     assetPolicySolanaIndexHint:
-      'Solana lists scan recent ids only — not a full index. Older raffles: search #ID.',
+      'Solana Live discovers raffles via getProgramAccounts; some public RPCs disable GPA (UI falls back and warns).',
     viewTx: 'View tx',
     copyLink: 'Copy link',
     copyLinkOk: 'Link copied',

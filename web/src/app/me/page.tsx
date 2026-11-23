@@ -41,14 +41,23 @@ export default function MePage() {
               ) : null}
             </p>
           </div>
-          {!address && (
+          {address ? (
+            <Link href={userPath(address)} className="btn sm">
+              {t('meCreatedLink')}
+            </Link>
+          ) : (
             <button type="button" className="btn primary sm touch" onClick={() => setVisible(true)}>
               {t('connect')}
             </button>
           )}
         </div>
         {!address && <div className="empty">{t('meConnect')}</div>}
-        {address && isLoading && <div className="empty">{t('meLoading')}</div>}
+        {address && isLoading && (
+          <div className="skeleton-grid" role="status" aria-busy="true" aria-label={t('meLoading')}>
+            <div className="skeleton-card" />
+            <div className="skeleton-card" />
+          </div>
+        )}
         {address && !isLoading && gpaFailed && (
           <p className="flash warn" style={{ marginBottom: 16 }}>
             {t('meSolanaNoIndex')}
@@ -57,7 +66,7 @@ export default function MePage() {
         {address && !isLoading && !hasAny && (
           <div className="empty">
             {t('meEmpty')} <Link href="/">{t('navRaffles')}</Link>
-            <p className="muted small" style={{ marginTop: 8 }}>
+            <p className="muted small" style={{ marginTop: 12 }}>
               {t('meSolanaHint')} <Link href="/">{t('navRaffles')}</Link>
             </p>
           </div>
@@ -137,7 +146,12 @@ export default function MePage() {
       </div>
 
       {!address && <div className="empty">{t('meConnect')}</div>}
-      {address && isLoading && <div className="empty">{t('meLoading')}</div>}
+      {address && isLoading && (
+        <div className="skeleton-grid" role="status" aria-busy="true" aria-label={t('meLoading')}>
+          <div className="skeleton-card" />
+          <div className="skeleton-card" />
+        </div>
+      )}
       {address && !isLoading && logsFailed && (
         <p className="flash warn" style={{ marginBottom: 16 }}>
           {t('meLogsFallback')}

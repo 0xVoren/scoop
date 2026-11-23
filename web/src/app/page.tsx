@@ -32,6 +32,7 @@ export default function HomePage() {
   const { family } = useChainFamily()
   const {
     raffles,
+    settled,
     isLoading,
     isFetching,
     refetch,
@@ -86,12 +87,29 @@ export default function HomePage() {
             </p>
           )}
 
-          {isLoading && <div className="empty">{t('homeLoading')}</div>}
+          {isLoading && (
+            <div
+              className="skeleton-grid"
+              role="status"
+              aria-busy="true"
+              aria-label={t('homeLoading')}
+            >
+              <div className="skeleton-card" />
+              <div className="skeleton-card" />
+              <div className="skeleton-card" />
+            </div>
+          )}
           {!isLoading && raffles.length === 0 && (
             <div className="empty">
               {hasAnyOnChain ? (
                 <>
                   {t('homeEmptyActive')} <Link href="/me">{t('navMe')}</Link>
+                  {family === 'solana' && settled.length > 0 ? (
+                    <>
+                      {' '}
+                      <a href="#archive">{t('homeArchiveLink')}</a>
+                    </>
+                  ) : null}
                 </>
               ) : family === 'solana' ? (
                 (() => {
@@ -138,6 +156,18 @@ export default function HomePage() {
                 {isFetching ? t('homeLoading') : t('homeLoadMore')}
               </button>
             </div>
+          )}
+
+          {family === 'solana' && !isLoading && settled.length > 0 && (
+            <section className="me-sect archive-sect" id="archive">
+              <h2 className="me-sect-h">{t('homeArchiveTitle')}</h2>
+              <p className="muted small archive-lead">{t('homeArchiveLead')}</p>
+              <div className="grid">
+                {settled.map((r) => (
+                  <RaffleCard key={`s-${r.orderId.toString()}`} {...r} onDone={() => refetch()} />
+                ))}
+              </div>
+            </section>
           )}
         </div>
 

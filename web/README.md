@@ -57,7 +57,7 @@ NEXT_PUBLIC_SOLANA_RPC=http://127.0.0.1:8899
 
 3. `pnpm dev` → switch header to **Solana** → connect Phantom/Solflare (localnet).
 4. **ActiveChain branching**: `/create`, `/raffle/?id=` (buy / draw / claim / refund / recover), and the home list use Solana adapters when `family=solana`; EVM uses wagmi. Draw entropy is **SlotHashes** (no VRF).
-5. Reads: `fetchSolanaRaffleById`; home list via sequential recent ids (**not** a full index).  
+5. Reads: `fetchSolanaRaffleById`; home list via `getProgramAccounts` on Raffle accounts (GPA fallback = bounded recent-id scan).  
    `/me` lists Solana purchases via **BuyerRecord GPA**. `/user` and `/token` have no secondary indexes on Solana and show an explicit empty / limitation state.
 
 Native SOL sentinel = `Pubkey::default()` (`1111…1111`); explicit wSOL mint uses ordinary SPL (no auto-wrap).  
