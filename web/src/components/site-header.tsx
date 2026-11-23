@@ -43,7 +43,11 @@ function ThemeIcon() {
 }
 
 function applyTheme(theme: 'light' | 'dark') {
-  document.documentElement.setAttribute('data-theme', theme)
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark')
+  } else {
+    document.documentElement.removeAttribute('data-theme')
+  }
   try {
     localStorage.setItem(THEME_KEY, theme)
   } catch {
@@ -76,9 +80,8 @@ export function SiteHeader() {
     } catch {
       // ignore
     }
-    const prefersLight =
-      typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: light)').matches
-    applyTheme(prefersLight ? 'light' : 'dark')
+    // Product default: light formal surface (dark remains an opt-in toggle).
+    applyTheme('light')
   }, [])
 
   useEffect(() => {
@@ -95,7 +98,7 @@ export function SiteHeader() {
   }, [])
 
   function toggleTheme() {
-    const cur = document.documentElement.getAttribute('data-theme') || 'dark'
+    const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'
     applyTheme(cur === 'dark' ? 'light' : 'dark')
   }
 

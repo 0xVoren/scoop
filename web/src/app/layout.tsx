@@ -8,19 +8,20 @@ const basePath = (process.env.NEXT_PUBLIC_BASE_PATH || '').replace(/\/$/, '')
 
 export const metadata: Metadata = {
   title: 'Scoop',
-  description: 'On-chain share raffle',
+  description:
+    'Dual-chain on-chain share raffle — escrow a prize, sell fixed shares, draw on-chain. BSC testnet & Solana devnet.',
   icons: {
     icon: [{ url: `${basePath}/favicon.svg`, type: 'image/svg+xml' }],
   },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#010409',
+  themeColor: '#eef2f0',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-CN">
+    <html lang="en">
       <body>
         <Providers>
           <SiteHeader />

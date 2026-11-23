@@ -20,7 +20,10 @@ export function ChainSwitch() {
       onClick={() => setFamily(family === 'evm' ? 'solana' : 'evm')}
     >
       {family === 'evm' ? t('chainFamilyEvm') : t('chainFamilySolana')}
-      <span aria-hidden="true"> · {meta.label}</span>
+      <span className="lbl" aria-hidden="true">
+        {' '}
+        · {meta.label}
+      </span>
     </button>
   )
 }
